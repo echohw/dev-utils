@@ -1,12 +1,14 @@
 package com.example.devutils.utils.io;
 
 import com.example.devutils.utils.text.StringUtils;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -109,4 +111,9 @@ public class FileUtils {
         }
     }
 
+    public static String readAllAsString(InputStream inputStream, Charset charset) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        copy(inputStream, outputStream);
+        return new String(outputStream.toByteArray(), charset);
+    }
 }
