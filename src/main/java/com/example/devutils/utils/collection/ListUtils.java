@@ -1,11 +1,8 @@
 package com.example.devutils.utils.collection;
 
-import com.example.devutils.dep.ObjectWrapper;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -14,10 +11,16 @@ import java.util.stream.Collectors;
  */
 public class ListUtils extends CollectionUtils {
 
+    /**
+     * 排序
+     */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator) {
         return sort(list, comparator, null);
     }
 
+    /**
+     * 排序
+     */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator, Supplier<L> listSupplier) {
         if (listSupplier == null) {
             list.sort(comparator);
@@ -27,12 +30,11 @@ public class ListUtils extends CollectionUtils {
         }
     }
 
-    public static <T, L extends Collection<T>> L distinct(List<T> list, Supplier<L> supplier) {
+    /**
+     * 去重
+     */
+    public static <I, C extends Collection<I>> C distinct(List<I> list, Supplier<C> supplier) {
         return list.stream().distinct().collect(Collectors.toCollection(supplier));
     }
 
-    public static <T, L extends Collection<T>> L distinct(List<T> list, Function<T, Integer> hashCodeFunc, BiFunction<T, T, Boolean> equalsBiFunc, Supplier<L> supplier) {
-        return list.stream().map(item -> new ObjectWrapper<>(item, hashCodeFunc, equalsBiFunc)).distinct().map(
-            ObjectWrapper::wrapped).collect(Collectors.toCollection(supplier));
-    }
 }
