@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 public class ListUtils extends CollectionUtils {
 
     /**
-     * 排序
+     * 排序[自身排序]
      */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator) {
         return sort(list, comparator, null);
     }
 
     /**
-     * 排序
+     * 排序[自身排序 or 返回新的列表]
      */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator, Supplier<L> listSupplier) {
         if (listSupplier == null) {

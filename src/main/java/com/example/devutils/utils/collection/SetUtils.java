@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
  */
 public class SetUtils extends CollectionUtils {
 
+    /**
+     * HashSet排序
+     */
     public static <T> LinkedHashSet<T> sort(HashSet<T> hashSet, Comparator<T> comparator) {
         return hashSet.stream().sorted(comparator).collect(Collectors.toCollection(LinkedHashSet::new));
     }

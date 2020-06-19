@@ -32,17 +32,22 @@ public class MapUtils {
         return map;
     }
 
+    /**
+     * 泛型擦除转换
+     */
     public static <K, V, M extends Map<K, V>> M actual(Map map, Supplier<M> templateSupplier) {
         return (M) map;
     }
 
+    /**
+     * HashMap排序
+     */
     public static <K, V> LinkedHashMap<K, V> sort(HashMap<K, V> hashMap, Comparator<Entry<K, V>> comparator) {
         return hashMap.entrySet().stream().sorted(comparator).collect(Collectors.toMap(Entry::getKey, Entry::getValue, (oldItem, newItem) -> newItem, LinkedHashMap::new));
     }
 
     /**
-     * 拉平Map
-     * Map<String, List<String>> -> R<String>
+     * 拉平
      */
     public static <K, V extends Collection<VI>, VI, R extends Collection<VI>> R flat(Map<K, V> map, Supplier<R> supplier) {
         return map.values().stream().flatMap(Collection::stream).collect(Collectors.toCollection(supplier));

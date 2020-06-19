@@ -1,8 +1,7 @@
-package com.example.devutils.utils;
+package com.example.devutils.utils.time;
 
 import com.example.devutils.dep.Zones;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,7 +10,6 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
@@ -141,32 +139,24 @@ public class TimeUtils {
         return toLocalDateTime(toInstant(srcDateTime, srcZoneId), targetZoneId);
     }
 
-    public static SimpleDateFormat getSimpleDateFormat(String pattern) {
-        return new SimpleDateFormat(pattern);
-    }
-
-    public static DateTimeFormatter getDateTimeFormatter(String pattern) {
-        return DateTimeFormatter.ofPattern(pattern);
-    }
-
     public static Date parseToDate(String dateStr, String pattern) throws ParseException {
-        return getSimpleDateFormat(pattern).parse(dateStr);
+        return TimeFormatterUtils.getSimpleDateFormat(pattern).parse(dateStr);
     }
 
     public static LocalDateTime parseToLocalDateTime(String dateTimeStr, String pattern) {
-        return LocalDateTime.parse(dateTimeStr, getDateTimeFormatter(pattern));
+        return LocalDateTime.parse(dateTimeStr, TimeFormatterUtils.getDateTimeFormatter(pattern));
     }
 
     public static Instant parseToInstant(String instantStr, String pattern) {
-        return ZonedDateTime.parse(instantStr, getDateTimeFormatter(pattern)).toInstant();
+        return ZonedDateTime.parse(instantStr, TimeFormatterUtils.getDateTimeFormatter(pattern)).toInstant();
     }
 
     public static String formatDate(Date date, String pattern) {
-        return getSimpleDateFormat(pattern).format(date);
+        return TimeFormatterUtils.getSimpleDateFormat(pattern).format(date);
     }
 
     public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern) {
-        return localDateTime.format(getDateTimeFormatter(pattern));
+        return localDateTime.format(TimeFormatterUtils.getDateTimeFormatter(pattern));
     }
 
     public static String formatInstant(Instant instant, String pattern) {
@@ -174,7 +164,7 @@ public class TimeUtils {
     }
 
     public static String formatInstant(Instant instant, String pattern, ZoneId zoneId) {
-        return DateTimeFormatter.ofPattern(pattern).withZone(zoneId).format(instant);
+        return TimeFormatterUtils.getDateTimeFormatter(pattern).withZone(zoneId).format(instant);
     }
 
     public static long betweenDays(LocalDateTime startInclusive, LocalDateTime endExclusive) {
