@@ -5,13 +5,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Created by AMe on 2020-06-12 14:00.
@@ -23,23 +22,48 @@ public class NioFileUtils {
         return Files.createFile(filePath, attrs);
     }
 
-    public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs)
-        throws IOException {
+    public static Path createFileIfNotExists(Path filePath, FileAttribute<?>... attrs) throws IOException {
+        if (PathUtils.notExists(filePath)) {
+            return createFile(filePath, attrs);
+        }
+        return filePath;
+    }
+
+    public static Path createTempFile(String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
         return Files.createTempFile(prefix, suffix, attrs);
     }
 
-    public static Path createTempFile(Path basePath, String prefix, String suffix,
-        FileAttribute<?>... attrs) throws IOException {
+    public static Path createTempFile(Path basePath, String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
         DirectoryUtils.createPlaceDirs(basePath);
         return Files.createTempFile(basePath, prefix, suffix, attrs);
     }
 
-    public static Path copy(Path srcFilePath, Path destFilePath) throws IOException {
-        return Files.copy(srcFilePath, destFilePath, StandardCopyOption.REPLACE_EXISTING);
+    public static Path copy(Path srcFilePath, Path destFilePath, CopyOption... options) throws IOException {
+        return Files.copy(srcFilePath, destFilePath, options);
     }
 
-    public static Path move(Path srcFilePath, Path destFilePath) throws IOException {
-        return Files.move(srcFilePath, destFilePath, StandardCopyOption.ATOMIC_MOVE);
+    public static long copy(Path srcFilePath, Path destFilePath, ByteBuffer byteBuffer, Consumer<Range<Long>> noticeConsumer) throws IOException {
+        return copy(srcFilePath, destFilePath, byteBuffer, 0, 0, getSize(srcFilePath), noticeConsumer);
+    }
+
+    public static long copy(Path srcFilePath, Path destFilePath, ByteBuffer byteBuffer, long srcFilePosition, long destFilePosition, long size, Consumer<Range<Long>> noticeConsumer) throws IOException {
+        createFileIfNotExists(destFilePath);
+        long fileSize = getSize(srcFilePath);
+        if (fileSize == 0) {
+            return 0;
+        }
+        try (
+            FileChannel inChannel = FileChannel.open(srcFilePath, StandardOpenOption.READ);
+            FileChannel outChannel = FileChannel.open(destFilePath, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
+        ) {
+            return NioChannelUtils.copy(inChannel, outChannel, byteBuffer, srcFilePosition, destFilePosition, size, noticeConsumer);
+        } catch (IOException ex) {
+            throw ex;
+        }
+    }
+
+    public static Path move(Path srcFilePath, Path destFilePath, CopyOption... options) throws IOException {
+        return Files.move(srcFilePath, destFilePath, options);
     }
 
     public static boolean delete(Path filePath) throws IOException {
@@ -66,88 +90,25 @@ public class NioFileUtils {
         return Files.size(filePath);
     }
 
-    public static byte[] readAllBytes(Path filePath) throws IOException {
+    public static byte[] readAsBytes(Path filePath) throws IOException {
         return Files.readAllBytes(filePath);
     }
 
-    public static String readAllText(Path filePath, Charset charset) throws IOException {
-        byte[] bytes = Files.readAllBytes(filePath);
-        return new String(bytes, charset);
+    public static String readAsString(Path filePath, Charset charset) throws IOException {
+        return new String(readAsBytes(filePath), charset);
     }
 
     public static Path writeBytes(Path filePath, byte[] bytes) throws IOException {
         return Files.write(filePath, bytes);
     }
 
-    public static Path writeText(Path filePath, String text) throws IOException {
-        return Files.write(filePath, text.getBytes(StandardCharsets.UTF_8));
+    public static Path writeString(Path filePath, String content, Charset charset) throws IOException {
+        return writeBytes(filePath, content.getBytes(charset));
     }
 
-    private static long preCopy(Path srcFilePath, Path destFilePath) throws IOException {
-        if (PathUtils.notExists(destFilePath)) {
-            createFile(destFilePath);
-        }
-        return Files.size(srcFilePath);
-    }
-
-    public static long copy(Path srcFilePath, Path destFilePath, int batchSize, BiConsumer<Long, Range<Long>> noticeConsumer) throws IOException {
-        long fileSize = preCopy(srcFilePath, destFilePath);
-        if (fileSize == 0) {
-            return 0;
-        }
-        try (
-            FileChannel inChannel = FileChannel.open(srcFilePath, StandardOpenOption.READ);
-            FileChannel outChannel = FileChannel.open(destFilePath, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-        ) {
-            return copy(inChannel, outChannel, batchSize, noticeConsumer);
-        } catch (IOException ex) {
-            throw ex;
-        }
-    }
-
-    public static long copy(FileChannel inChannel, FileChannel outChannel, int batchSize, BiConsumer<Long, Range<Long>> noticeConsumer) throws IOException {
-        long fileSize = inChannel.size();
-        long readCount = 0;
-        long len;
-        for (;readCount < fileSize; readCount += len) {
-            len = inChannel.transferTo(readCount, batchSize, outChannel);
-            if (noticeConsumer != null) {
-                noticeConsumer.accept(fileSize, new Range<>(readCount + 1, readCount + len));
-            }
-        }
-        return readCount;
-    }
-
-    public static long copy(Path srcFilePath, Path destFilePath, int bufferSize, boolean direct, BiConsumer<Long, Range<Long>> noticeConsumer) throws IOException {
-        long fileSize = preCopy(srcFilePath, destFilePath);
-        if (fileSize == 0) {
-            return 0;
-        }
-        try (
-            FileChannel inChannel = FileChannel.open(srcFilePath, StandardOpenOption.READ);
-            FileChannel outChannel = FileChannel.open(destFilePath, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-        ) {
-            return copy(inChannel, outChannel, bufferSize, direct, noticeConsumer);
-        } catch (IOException ex) {
-            throw ex;
-        }
-    }
-
-    public static long copy(FileChannel inChannel, FileChannel outChannel, int bufferSize, boolean direct, BiConsumer<Long, Range<Long>> noticeConsumer) throws IOException {
-        long fileSize = inChannel.size();
-        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bufferSize, direct);
-        long readCount = 0;
-        int len;
-        while ((len = inChannel.read(byteBuffer)) > 0) {
-            byteBuffer.flip();
-            outChannel.write(byteBuffer);
-            byteBuffer.clear();
-            if (noticeConsumer != null) {
-                noticeConsumer.accept(fileSize, new Range<>(readCount + 1, readCount + len));
-            }
-            readCount += len;
-        }
-        return readCount;
+    public static void allocateSize(FileChannel outChannel, long size) throws IOException {
+        outChannel.position(size - 1);
+        outChannel.write(NioBufferUtils.getByteBuffer(1, false));
     }
 
 }
