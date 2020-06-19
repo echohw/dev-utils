@@ -82,14 +82,8 @@ public class NioChannelUtils {
     }
 
     public static String readAsString(ReadableByteChannel channel, int bufferSize, Charset charset) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bufferSize, false);
-        while (channel.read(byteBuffer) > 0) {
-            byteBuffer.flip();
-            stringBuilder.append(new String(byteBuffer.array(), 0, byteBuffer.limit(), charset));
-            byteBuffer.clear();
-        }
-        return stringBuilder.toString();
+        ByteArrayOutputStream byteArrayOutputStream = readAsBytes(channel, bufferSize, new ByteArrayOutputStream());
+        return new String(byteArrayOutputStream.toByteArray(), charset);
     }
 
     public static ByteArrayOutputStream readAsBytes(ReadableByteChannel channel, int bufferSize, ByteArrayOutputStream outputStream) throws IOException {
@@ -103,18 +97,15 @@ public class NioChannelUtils {
     }
 
     public static int writeString(WritableByteChannel channel, String content, Charset charset) throws IOException {
-        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(content, charset);
-        return channel.write(byteBuffer);
+        return writeBytes(channel, content.getBytes(charset));
     }
 
     public static Future<Integer> writeString(AsynchronousByteChannel channel, String content, Charset charset) throws IOException {
-        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(content, charset);
-        return channel.write(byteBuffer);
+        return writeBytes(channel, content.getBytes(charset));
     }
 
-    public static <A> void writeString(AsynchronousByteChannel channel, String content, Charset charset, A attachment, CompletionHandler<Integer,? super A> handler) throws IOException {
-        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(content, charset);
-        channel.write(byteBuffer, attachment, handler);
+    public static <A> void writeString(AsynchronousByteChannel channel, String content, Charset charset, A attachment, CompletionHandler<Integer, ? super A> handler) {
+        writeBytes(channel, content.getBytes(charset), attachment, handler);
     }
 
     public static int writeBytes(WritableByteChannel channel, byte[] bytes) throws IOException {
@@ -122,12 +113,12 @@ public class NioChannelUtils {
         return channel.write(byteBuffer);
     }
 
-    public static Future<Integer> writeBytes(AsynchronousByteChannel channel, byte[] bytes) throws IOException {
+    public static Future<Integer> writeBytes(AsynchronousByteChannel channel, byte[] bytes) {
         ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bytes);
         return channel.write(byteBuffer);
     }
 
-    public static <A> void writeBytes(AsynchronousByteChannel channel, byte[] bytes, A attachment, CompletionHandler<Integer,? super A> handler) throws IOException {
+    public static <A> void writeBytes(AsynchronousByteChannel channel, byte[] bytes, A attachment, CompletionHandler<Integer,? super A> handler) {
         ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bytes);
         channel.write(byteBuffer, attachment, handler);
     }

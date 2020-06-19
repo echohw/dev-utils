@@ -260,4 +260,8 @@ public class RandomAccessFileUtils {
         return new RandomAccessFile(file, accessMode);
     }
 
+    public static void allocateSize(RandomAccessFile randomAccessFile, long size) throws IOException {
+        randomAccessFile.setLength(size);
+    }
+
 }

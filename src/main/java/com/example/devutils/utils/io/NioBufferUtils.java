@@ -1,5 +1,6 @@
 package com.example.devutils.utils.io;
 
+import com.example.devutils.dep.Charsets;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -14,7 +15,7 @@ public class NioBufferUtils {
     }
 
     public static ByteBuffer getByteBuffer(String content) {
-        return Charset.defaultCharset().encode(content);
+        return getByteBuffer(content, Charsets.UTF8_C);
     }
 
     public static ByteBuffer getByteBuffer(String content, Charset charset) {

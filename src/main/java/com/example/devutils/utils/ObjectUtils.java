@@ -48,12 +48,4 @@ public class ObjectUtils {
     public static <T> T parseJsonStr(String jsonStr, Class<T> clazz) throws IOException {
         return objectMapper.readValue(jsonStr, clazz);
     }
-
-    public static <T> int hashCode(T object, Function<T, Integer> hashCodeFunc) {
-        return hashCodeFunc.apply(object);
-    }
-
-    public static <T> boolean equals(T o1, T o2, BiFunction<T, T, Boolean> equalsBiFunc) {
-        return equalsBiFunc.apply(o1, o2);
-    }
 }
