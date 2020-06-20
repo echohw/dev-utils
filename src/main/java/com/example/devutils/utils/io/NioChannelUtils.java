@@ -85,36 +85,65 @@ public class NioChannelUtils {
         return AsynchronousServerSocketChannel.open(channelGroup);
     }
 
-    public static String readAsString(ReadableByteChannel channel, ByteBuffer byteBuffer, Charset charset) throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = readAsBytes(channel, byteBuffer, new ByteArrayOutputStream());
-        return new String(byteArrayOutputStream.toByteArray(), charset);
-    }
-
-    public static ByteArrayOutputStream readAsBytes(ReadableByteChannel channel, ByteBuffer byteBuffer, ByteArrayOutputStream outputStream) throws IOException {
+    public static byte[] readAsBytes(ReadableByteChannel channel, ByteBuffer byteBuffer) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byteBuffer.clear();
         while (channel.read(byteBuffer) > 0) {
             byteBuffer.flip();
             outputStream.write(byteBuffer.array(), 0, byteBuffer.limit());
             byteBuffer.clear();
         }
-        return outputStream;
+        return outputStream.toByteArray();
     }
 
-    public static int writeString(WritableByteChannel channel, String content, Charset charset) throws IOException {
-        return writeBytes(channel, content.getBytes(charset));
+    public static byte[] readAsBytes(FileChannel channel, ByteBuffer byteBuffer, long position, long size) throws IOException {
+        if (position + size > channel.size()) {
+            throw new IllegalArgumentException("The read position will exceed the file size");
+        }
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        long readCount = 0;
+        long len;
+        byteBuffer.clear();
+        while (readCount < size) {
+            if (readCount + byteBuffer.limit() > size) {
+                int limit = (int) (size - readCount);
+                byteBuffer.limit(limit);
+            }
+            if ((len = channel.read(byteBuffer, position)) <= 0) {
+                break;
+            }
+            byteBuffer.flip();
+            outputStream.write(byteBuffer.array(), 0, byteBuffer.limit());
+            byteBuffer.clear();
+            readCount += len;
+            position += len;
+        }
+        return outputStream.toByteArray();
     }
 
-    public static Future<Integer> writeString(AsynchronousByteChannel channel, String content, Charset charset) throws IOException {
-        return writeBytes(channel, content.getBytes(charset));
+    public static byte[] readAsBytes(FileChannel channel, long position, int size) throws IOException {
+        MappedByteBuffer mappedByteBuffer = channel.map(MapMode.READ_ONLY, position, size);
+        return mappedByteBuffer.array();
     }
 
-    public static <A> void writeString(AsynchronousByteChannel channel, String content, Charset charset, A attachment, CompletionHandler<Integer, ? super A> handler) {
-        writeBytes(channel, content.getBytes(charset), attachment, handler);
+    public static String readAsString(ReadableByteChannel channel, ByteBuffer byteBuffer, Charset charset) throws IOException {
+        byte[] bytes = readAsBytes(channel, byteBuffer);
+        return new String(bytes, charset);
+    }
+
+    public static String readAsString(FileChannel channel, ByteBuffer byteBuffer, long position, long size, Charset charset) throws IOException {
+        byte[] bytes = readAsBytes(channel, byteBuffer, position, size);
+        return new String(bytes, charset);
     }
 
     public static int writeBytes(WritableByteChannel channel, byte[] bytes) throws IOException {
         ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bytes);
         return channel.write(byteBuffer);
+    }
+
+    public static int writeBytes(FileChannel channel, byte[] bytes, long position) throws IOException {
+        ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bytes);
+        return channel.write(byteBuffer, position);
     }
 
     public static Future<Integer> writeBytes(AsynchronousByteChannel channel, byte[] bytes) {
@@ -125,6 +154,22 @@ public class NioChannelUtils {
     public static <A> void writeBytes(AsynchronousByteChannel channel, byte[] bytes, A attachment, CompletionHandler<Integer,? super A> handler) {
         ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bytes);
         channel.write(byteBuffer, attachment, handler);
+    }
+
+    public static int writeString(WritableByteChannel channel, String content, Charset charset) throws IOException {
+        return writeBytes(channel, content.getBytes(charset));
+    }
+
+    public static int writeString(FileChannel channel, String content, long position, Charset charset) throws IOException {
+        return writeBytes(channel, content.getBytes(charset), position);
+    }
+
+    public static Future<Integer> writeString(AsynchronousByteChannel channel, String content, Charset charset) {
+        return writeBytes(channel, content.getBytes(charset));
+    }
+
+    public static <A> void writeString(AsynchronousByteChannel channel, String content, Charset charset, A attachment, CompletionHandler<Integer, ? super A> handler) {
+        writeBytes(channel, content.getBytes(charset), attachment, handler);
     }
 
     public static long copy(ReadableByteChannel readChannel, WritableByteChannel writeChannel, ByteBuffer byteBuffer, Consumer<Range<Long>> noticeConsumer) throws IOException {

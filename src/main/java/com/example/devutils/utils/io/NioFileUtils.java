@@ -17,6 +17,8 @@ import java.util.function.Consumer;
  */
 public class NioFileUtils {
 
+    public static final int BUFFER_SIZE = 4096;
+
     public static Path createFile(Path filePath, FileAttribute<?>... attrs) throws IOException {
         DirectoryUtils.createPlaceDirs(filePath);
         return Files.createFile(filePath, attrs);
@@ -36,6 +38,50 @@ public class NioFileUtils {
     public static Path createTempFile(Path basePath, String prefix, String suffix, FileAttribute<?>... attrs) throws IOException {
         DirectoryUtils.createPlaceDirs(basePath);
         return Files.createTempFile(basePath, prefix, suffix, attrs);
+    }
+
+    public static long getSize(Path filePath) throws IOException {
+        return Files.size(filePath);
+    }
+
+    public static byte[] readAsBytes(Path filePath) throws IOException {
+        return Files.readAllBytes(filePath);
+    }
+
+    public static byte[] readAsBytes(Path filePath, long position, int size) throws IOException {
+        try (
+            FileChannel channel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.READ);
+        ) {
+            ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(BUFFER_SIZE, false);
+            return NioChannelUtils.readAsBytes(channel, byteBuffer, position, size);
+        } catch (IOException ex) {
+            throw ex;
+        }
+    }
+
+    public static String readAsString(Path filePath, Charset charset) throws IOException {
+        return new String(readAsBytes(filePath), charset);
+    }
+
+    public static String readAsString(Path filePath, long position, int size, Charset charset) throws IOException {
+        return new String(readAsBytes(filePath, position, size), charset);
+    }
+
+    public static Path writeBytes(Path filePath, byte[] bytes) throws IOException {
+        return Files.write(filePath, bytes);
+    }
+
+    public static int writeBytes(Path filePath, byte[] bytes, long position) throws IOException {
+        FileChannel fileChannel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.WRITE);
+        return NioChannelUtils.writeBytes(fileChannel, bytes, position);
+    }
+
+    public static Path writeString(Path filePath, String content, Charset charset) throws IOException {
+        return writeBytes(filePath, content.getBytes(charset));
+    }
+
+    public static int writeString(Path filePath, String content, long position, Charset charset) throws IOException {
+        return writeBytes(filePath, content.getBytes(charset), position);
     }
 
     public static Path copy(Path srcFilePath, Path destFilePath, CopyOption... options) throws IOException {
@@ -84,26 +130,6 @@ public class NioFileUtils {
 
     public static boolean isHidden(Path filePath) throws IOException {
         return Files.isHidden(filePath);
-    }
-
-    public static long getSize(Path filePath) throws IOException {
-        return Files.size(filePath);
-    }
-
-    public static byte[] readAsBytes(Path filePath) throws IOException {
-        return Files.readAllBytes(filePath);
-    }
-
-    public static String readAsString(Path filePath, Charset charset) throws IOException {
-        return new String(readAsBytes(filePath), charset);
-    }
-
-    public static Path writeBytes(Path filePath, byte[] bytes) throws IOException {
-        return Files.write(filePath, bytes);
-    }
-
-    public static Path writeString(Path filePath, String content, Charset charset) throws IOException {
-        return writeBytes(filePath, content.getBytes(charset));
     }
 
     public static void allocateSize(FileChannel outChannel, long size) throws IOException {

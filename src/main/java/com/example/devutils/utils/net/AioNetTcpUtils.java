@@ -19,7 +19,6 @@ public class AioNetTcpUtils {
         return NioChannelUtils.getAsynchronousSocketChannel(channelGroup);
     }
 
-
     public static AsynchronousServerSocketChannel getServerSocketChannel() throws IOException {
         return NioChannelUtils.getAsynchronousServerSocketChannel();
     }
