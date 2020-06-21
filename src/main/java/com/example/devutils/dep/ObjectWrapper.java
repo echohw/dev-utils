@@ -1,5 +1,6 @@
 package com.example.devutils.dep;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -30,16 +31,23 @@ public class ObjectWrapper<T> {
 
     @Override
     public int hashCode() {
-        return hashCodeFunc.apply(object);
+        return Optional.ofNullable(hashCodeFunc).map(func -> func.apply(object)).orElseGet(() -> object.hashCode());
     }
 
     @Override
-    public boolean equals(Object o2) {
-        if (o2 instanceof ObjectWrapper) {
-            o2 = ((ObjectWrapper) o2).object;
+    public boolean equals(Object object2) {
+        if (object2 instanceof ObjectWrapper) {
+            object2 = ((ObjectWrapper) object2).object;
         }
-        if (o2.getClass() == object.getClass() || force) {
-            return equalsBiFunc.apply(object, (T) o2);
+        if (object == object2) {
+            return true;
+        }
+        if (object == null || object2 == null) {
+            return false;
+        }
+        if (object2.getClass() == object.getClass() || force) {
+            Object o2 = object2;
+            return Optional.ofNullable(equalsBiFunc).map(func -> func.apply(object, (T) o2)).orElseGet(() -> object.equals(o2));
         } else {
             return false;
         }

@@ -3,7 +3,7 @@ package com.example.devutils.utils.office;
 import com.example.devutils.dep.Charsets;
 import com.example.devutils.dep.WkhtmlOptions;
 import com.example.devutils.utils.ProcessInvokeUtils;
-import com.example.devutils.utils.io.FileUtils;
+import com.example.devutils.utils.io.StreamUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.function.Consumer;
@@ -39,8 +39,8 @@ public class WkhtmlUtils {
                 InputStream inputStream = process.getInputStream();
                 InputStream errorStream = process.getErrorStream();
             ) {
-                String out = FileUtils.readAllAsString(inputStream, Charsets.UTF8_C);
-                String err = FileUtils.readAllAsString(errorStream, Charsets.UTF8_C);
+                String out = StreamUtils.readAsString(inputStream, Charsets.UTF_8);
+                String err = StreamUtils.readAsString(errorStream, Charsets.UTF_8);
                 logger.info("OutputStream: {}", out);
                 logger.info("ErrorStream: {}", err);
             } catch (IOException ex) {

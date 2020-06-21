@@ -57,6 +57,12 @@
       <artifactId>jsoup</artifactId>
       <version>1.11.3</version>
     </dependency>
+    <!-- UserAgent解析 -->
+    <dependency>
+      <groupId>eu.bitwalker</groupId>
+      <artifactId>UserAgentUtils</artifactId>
+      <version>1.21</version>
+    </dependency>
   </dependencies>
 
 </project>

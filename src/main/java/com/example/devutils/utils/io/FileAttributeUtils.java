@@ -106,12 +106,12 @@ public class FileAttributeUtils {
         ByteBuffer byteBuffer = ByteBuffer.allocate(userDefinedView.size(attrName));
         userDefinedView.read(attrName, byteBuffer);
         byteBuffer.flip();
-        return Charsets.UTF8_C.decode(byteBuffer).toString();
+        return Charsets.UTF_8.decode(byteBuffer).toString();
     }
 
     public static int setAttr(Path filePath, String attrName, String attrValue) throws IOException {
         UserDefinedFileAttributeView userDefinedView = getUserDefinedView(filePath);
-        return userDefinedView.write(attrName, Charsets.UTF8_C.encode(attrValue));
+        return userDefinedView.write(attrName, Charsets.UTF_8.encode(attrValue));
     }
 
     public static void deleteAttr(Path filePath, String attrName) throws IOException {

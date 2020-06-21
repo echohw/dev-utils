@@ -7,12 +7,12 @@ import java.nio.charset.Charset;
  */
 public class Charsets {
 
-    public static final String UTF8_S = "UTF-8";
-    public static final String GBK_S = "GBK";
-    public static final String ISO88591_S = "ISO-8859-1";
+    public static final Charset SYSTEM = Charset.forName(System.getProperty("file.encoding"));
 
-    public static final Charset UTF8_C = Charset.forName(UTF8_S);
-    public static final Charset GBK_C = Charset.forName(GBK_S);
-    public static final Charset ISO88591_C = Charset.forName(ISO88591_S);
+    public static final Charset UTF_8 = Charset.forName("UTF-8");
+    public static final Charset GBK = Charset.forName("GBK");
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+
+    public static final Charset DEFAULT = Charset.defaultCharset();
 
 }

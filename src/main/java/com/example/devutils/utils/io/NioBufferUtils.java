@@ -15,7 +15,7 @@ public class NioBufferUtils {
     }
 
     public static ByteBuffer getByteBuffer(String content) {
-        return getByteBuffer(content, Charsets.UTF8_C);
+        return getByteBuffer(content, Charsets.UTF_8);
     }
 
     public static ByteBuffer getByteBuffer(String content, Charset charset) {

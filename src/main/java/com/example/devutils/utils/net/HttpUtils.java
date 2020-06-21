@@ -1,6 +1,7 @@
 package com.example.devutils.utils.net;
 
-import com.example.devutils.dep.UserAgent;
+import com.example.devutils.dep.UserAgents;
+import com.example.devutils.utils.UserAgentUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
@@ -22,10 +23,6 @@ public class HttpUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
 
-    private static final UserAgent userAgent = new UserAgent(Arrays.asList(
-        "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36"
-    ));
-
     public static OkHttpClient getHttpClient() {
         return new OkHttpClient.Builder().readTimeout(30, TimeUnit.SECONDS).build();
     }
@@ -34,7 +31,7 @@ public class HttpUtils {
         Builder builder = new Builder()
             .url(url)
             .method(requestMethod.name(), body)
-            .header("User-Agent", userAgent.random().get());
+            .header("User-Agent", UserAgentUtils.random());
         return builder.build();
     }
 

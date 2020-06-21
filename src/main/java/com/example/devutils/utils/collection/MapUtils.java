@@ -1,5 +1,6 @@
 package com.example.devutils.utils.collection;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,6 +14,14 @@ import java.util.stream.Collectors;
  * Created by AMe on 2020-06-13 11:28.
  */
 public class MapUtils {
+
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
+    public static boolean isNotEmpty(Map<?, ?> map) {
+        return !isEmpty(map);
+    }
 
     public static <I, K, V, M extends Map<K, V>> M of(Supplier<M> mapSupplier, I... items) {
         M map = mapSupplier.get();

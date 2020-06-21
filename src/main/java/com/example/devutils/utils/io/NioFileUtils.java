@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -54,8 +55,6 @@ public class NioFileUtils {
         ) {
             ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(BUFFER_SIZE, false);
             return NioChannelUtils.readAsBytes(channel, byteBuffer, position, size);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 
@@ -67,13 +66,20 @@ public class NioFileUtils {
         return new String(readAsBytes(filePath, position, size), charset);
     }
 
+    public static List<String> readAsLines(Path filePath, Charset charset) throws IOException {
+        return Files.readAllLines(filePath, charset);
+    }
+
     public static Path writeBytes(Path filePath, byte[] bytes) throws IOException {
         return Files.write(filePath, bytes);
     }
 
     public static int writeBytes(Path filePath, byte[] bytes, long position) throws IOException {
-        FileChannel fileChannel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.WRITE);
-        return NioChannelUtils.writeBytes(fileChannel, bytes, position);
+        try (
+            FileChannel fileChannel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.WRITE);
+        ) {
+            return NioChannelUtils.writeBytes(fileChannel, bytes, position);
+        }
     }
 
     public static Path writeString(Path filePath, String content, Charset charset) throws IOException {
@@ -103,8 +109,6 @@ public class NioFileUtils {
             FileChannel outChannel = FileChannel.open(destFilePath, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
         ) {
             return NioChannelUtils.copy(inChannel, outChannel, byteBuffer, srcFilePosition, destFilePosition, size, noticeConsumer);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 
