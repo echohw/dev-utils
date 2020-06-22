@@ -4,6 +4,7 @@ import com.example.devutils.dep.Charsets;
 import com.example.devutils.dep.UserAgents;
 import com.example.devutils.utils.collection.MapUtils;
 import com.example.devutils.utils.io.StreamUtils;
+import eu.bitwalker.useragentutils.UserAgent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +63,10 @@ public class UserAgentUtils {
 
     public static String random(String group) {
         return UserAgentsHolder.userAgents.random(group);
+    }
+
+    public static UserAgent parseUserAgent(String userAgent) {
+        return UserAgent.parseUserAgentString(userAgent);
     }
 
 }
