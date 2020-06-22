@@ -25,8 +25,6 @@ public class NioNetUdpUtils extends NetUtils {
             ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(data);
             InetSocketAddress address = getInetSocketAddress(host, port);
             return send(datagramChannel, byteBuffer, address);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 
@@ -42,8 +40,6 @@ public class NioNetUdpUtils extends NetUtils {
             datagramChannel.bind(address);
             ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(bufferSize, false);
             receive(datagramChannel, byteBuffer, consumer);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 

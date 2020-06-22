@@ -18,8 +18,6 @@ public class ObjectUtils {
             ObjectOutputStream objOut = new ObjectOutputStream(byteOut);
         ) {
             objOut.writeObject(object);
-        } catch (IOException ex) {
-            throw ex;
         }
         return byteOut.toByteArray();
     }
@@ -30,9 +28,11 @@ public class ObjectUtils {
             ObjectInputStream objIn = new ObjectInputStream(byteIn);
         ) {
             return (T) objIn.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
-            throw ex;
         }
+    }
+
+    public static <T extends Serializable> T deepClone(T object) throws IOException, ClassNotFoundException {
+        return readObject(writeObject(object));
     }
 
 }

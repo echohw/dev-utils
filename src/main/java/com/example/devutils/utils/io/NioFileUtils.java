@@ -62,36 +62,35 @@ public class NioFileUtils {
         return new String(readAsBytes(filePath), charset);
     }
 
-    public static String readAsString(Path filePath, long position, int size, Charset charset) throws IOException {
-        return new String(readAsBytes(filePath, position, size), charset);
-    }
-
     public static List<String> readAsLines(Path filePath, Charset charset) throws IOException {
         return Files.readAllLines(filePath, charset);
     }
 
-    public static Path writeBytes(Path filePath, byte[] bytes) throws IOException {
-        return Files.write(filePath, bytes);
+    public static int writeBytes(Path filePath, byte[] bytes) throws IOException {
+        Files.write(filePath, bytes);
+        return bytes.length;
     }
 
     public static int writeBytes(Path filePath, byte[] bytes, long position) throws IOException {
         try (
-            FileChannel fileChannel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.WRITE);
+            FileChannel channel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.WRITE);
         ) {
-            return NioChannelUtils.writeBytes(fileChannel, bytes, position);
+            return NioChannelUtils.writeBytes(channel, bytes, position);
         }
     }
 
-    public static Path writeString(Path filePath, String content, Charset charset) throws IOException {
-        return writeBytes(filePath, content.getBytes(charset));
+    public static int writeString(Path filePath, String content, Charset charset) throws IOException {
+        writeBytes(filePath, content.getBytes(charset));
+        return content.length();
     }
 
-    public static int writeString(Path filePath, String content, long position, Charset charset) throws IOException {
-        return writeBytes(filePath, content.getBytes(charset), position);
+    public static long copy(Path srcFilePath, Path destFilePath, CopyOption... options) throws IOException {
+        Files.copy(srcFilePath, destFilePath, options);
+        return getSize(srcFilePath);
     }
 
-    public static Path copy(Path srcFilePath, Path destFilePath, CopyOption... options) throws IOException {
-        return Files.copy(srcFilePath, destFilePath, options);
+    public static long copy(Path srcFilePath, Path destFilePath, ByteBuffer byteBuffer) throws IOException {
+        return copy(srcFilePath, destFilePath, byteBuffer, null);
     }
 
     public static long copy(Path srcFilePath, Path destFilePath, ByteBuffer byteBuffer, Consumer<Range<Long>> noticeConsumer) throws IOException {

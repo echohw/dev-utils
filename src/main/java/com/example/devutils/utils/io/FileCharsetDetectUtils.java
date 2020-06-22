@@ -12,7 +12,8 @@
 // import java.nio.charset.Charset;
 //
 // /**
-//  * 文件编码探测工具类 Created by AMe on 2020-06-05 23:45.
+//  * 文件编码探测工具类
+//  * Created by AMe on 2020-06-05 23:45.
 //  */
 // public class FileCharsetDetectUtils {
 //

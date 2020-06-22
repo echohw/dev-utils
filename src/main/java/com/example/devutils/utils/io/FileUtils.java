@@ -1,67 +1,119 @@
 package com.example.devutils.utils.io;
 
 import com.example.devutils.utils.text.StringUtils;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Created by AMe on 2020-06-05 23:40.
  */
 public class FileUtils {
 
-    private static Logger logger = LoggerFactory.getLogger(FileUtils.class);
-
     public static final int BUFFER_SIZE = 4096;
 
-    public static Optional<String> getFileExtName(String fileName) {
+    public static File getFile(String filePath) {
+        return new File(filePath);
+    }
+
+    public static boolean createFile(File file) throws IOException {
+        return file.createNewFile();
+    }
+
+    public static String getExtName(String fileName) {
         int posi;
         if (StringUtils.isBlank(fileName) || (posi = fileName.lastIndexOf(".")) == -1 || posi == fileName.length() - 1) {
-            return Optional.empty();
+            return null;
         }
-        return Optional.of(fileName.substring(posi + 1));
+        return fileName.substring(posi + 1);
+    }
+
+    public static long getSize(File file) {
+        return file.length();
+    }
+
+    public static byte[] readAsBytes(File file) throws IOException {
+        try (
+            BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+        ) {
+            return StreamUtils.readAsBytes(inputStream, BUFFER_SIZE);
+        }
+    }
+
+    public static String readAsString(File file, Charset charset) throws IOException {
+        try (
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
+        ) {
+            return StreamUtils.readAsString(bufferedReader, BUFFER_SIZE);
+        }
+    }
+
+    public static List<String> readAsLines(File file, Charset charset) throws IOException {
+        try (
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
+        ) {
+            return StreamUtils.readAsLines(bufferedReader);
+        }
+    }
+
+    public static long writeBytes(File file, byte[] bytes) throws IOException {
+        try (
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(file));
+        ) {
+            return StreamUtils.writeBytes(outputStream, bytes);
+        }
+    }
+
+    public static long writeString(File file, String content, Charset charset) throws IOException {
+        try (
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
+        ) {
+            return StreamUtils.writeString(bufferedWriter, content);
+        }
+    }
+
+    public static long writeLines(File file, List<String> lineList, Charset charset) throws IOException {
+        try (
+            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
+        ) {
+            return StreamUtils.writeLines(bufferedWriter, lineList);
+        }
     }
 
     /**
      * 压缩文件
      */
-    public static File zipFile(Collection<File> srcFileList, File destFile,
-        Function<File, String> namingHandler) {
-        if (namingHandler == null) {
-            namingHandler = File::getName;
-        }
+    public static File zipFile(Collection<File> srcFileList, File destFile, Function<File, String> namingHandler) throws IOException {
+        namingHandler = namingHandler == null ? File::getName : namingHandler;
         try (
-            ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(destFile));
+            FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+            ZipOutputStream zipOutputStream = new ZipOutputStream(fileOutputStream);
         ) {
             for (File srcFile : srcFileList) {
                 String fileName = namingHandler.apply(srcFile);
                 zipOutputStream.putNextEntry(new ZipEntry(fileName));
                 try (
-                    FileInputStream fileInputStream = new FileInputStream(srcFile);
+                    BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(srcFile));
                 ) {
-                    copy(fileInputStream, zipOutputStream);
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage());
+                    StreamUtils.copy(inputStream, zipOutputStream, BUFFER_SIZE, null);
                 }
                 zipOutputStream.closeEntry();
             }
-        } catch (IOException ex) {
-            throw new RuntimeException(ex.getMessage());
         }
         return destFile;
     }
@@ -69,51 +121,27 @@ public class FileUtils {
     /**
      * 解压文件
      */
-    public static List<File> unzipFile(File srcFile, String basePath,
-        Function<ZipEntry, String> namingHandler) {
+    public static List<File> unzipFile(File srcFile, String basePath, Function<ZipEntry, String> namingHandler) throws IOException {
         List<File> destFileList = new ArrayList<>();
-        if (namingHandler == null) {
-            namingHandler = ZipEntry::getName;
-        }
+        namingHandler = namingHandler == null ? ZipEntry::getName : namingHandler;
         try (
-            ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(srcFile));
+            FileInputStream fileInputStream = new FileInputStream(srcFile);
+            ZipInputStream zipInputStream = new ZipInputStream(fileInputStream);
         ) {
             ZipEntry nextEntry;
             while ((nextEntry = zipInputStream.getNextEntry()) != null) {
                 String fileName = namingHandler.apply(nextEntry);
                 File destFile = new File(basePath, fileName);
                 try (
-                    FileOutputStream fileOutputStream = new FileOutputStream(destFile);
+                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destFile));
                 ) {
-                    copy(zipInputStream, fileOutputStream);
-                } catch (IOException ex) {
-                    logger.error(ex.getMessage());
+                    StreamUtils.copy(zipInputStream, outputStream, BUFFER_SIZE, null);
                 }
-                destFileList.add(destFile);
                 zipInputStream.closeEntry();
+                destFileList.add(destFile);
             }
-        } catch (IOException ex) {
-            throw new RuntimeException(ex.getMessage());
         }
         return destFileList;
     }
 
-    public static void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
-        copy(inputStream, outputStream, 4096);
-    }
-
-    public static void copy(InputStream inputStream, OutputStream outputStream, int bufSize)
-        throws IOException {
-        byte[] byteBuf = new byte[bufSize];
-        int len;
-        while ((len = inputStream.read(byteBuf)) != -1) {
-            outputStream.write(byteBuf, 0, len);
-        }
-    }
-
-    public static String readAllAsString(InputStream inputStream, Charset charset) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        copy(inputStream, outputStream);
-        return new String(outputStream.toByteArray(), charset);
-    }
 }

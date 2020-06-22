@@ -43,8 +43,6 @@ public class NetUdpUtils extends NetUtils {
             InetAddress address = getInetAddress(host);
             DatagramPacket packet = getDatagramPacket(data, data.length, address, port);
             send(socket, packet);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 
@@ -59,8 +57,6 @@ public class NetUdpUtils extends NetUtils {
             byte[] bytes = new byte[bufferSize];
             DatagramPacket packet = getDatagramPacket(bytes, bytes.length);
             receive(socket, packet, consumer);
-        } catch (IOException ex) {
-            throw ex;
         }
     }
 

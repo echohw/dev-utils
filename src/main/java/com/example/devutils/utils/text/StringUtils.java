@@ -1,5 +1,7 @@
 package com.example.devutils.utils.text;
 
+import java.util.UUID;
+
 /**
  * Created by AMe on 2020-06-09 13:09.
  */
@@ -23,6 +25,15 @@ public class StringUtils {
             }
         }
         return stringBuilder.toString();
+    }
+
+    public static String getUuid(boolean delimiter) {
+        String uuid = UUID.randomUUID().toString();
+        return delimiter ? uuid : uuid.replace("-", "");
+    }
+
+    public static String getUuid() {
+        return getUuid(true);
     }
 
 }
