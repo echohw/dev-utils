@@ -63,6 +63,12 @@
       <artifactId>UserAgentUtils</artifactId>
       <version>1.21</version>
     </dependency>
+    <!-- FastDFS -->
+    <dependency>
+      <groupId>org.csource.fastdfs</groupId>
+      <artifactId>fastdfs</artifactId>
+      <version>1.2</version>
+    </dependency>
   </dependencies>
 
 </project>
