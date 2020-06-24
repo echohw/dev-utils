@@ -20,15 +20,17 @@ public class GoFastDFSUtils {
 
     private static final String serverUrl = "http://xxx:8080/group1/upload";
 
+    private static final OkHttpUtils okHttpUtils = new OkHttpUtils();
+
     public static String uploadFile(String filePath) throws IOException {
         String fileName = Paths.get(filePath).getFileName().toString();
         List<Part> parts = Arrays.asList(
             Part.createFormData("file", fileName, RequestBody.create(MediaType.parse(MediaTypes.MULTIPART_FORM_DATA), new File(filePath))),
             Part.createFormData("output", "json")
         );
-        RequestBody requestBody = OkHttpUtils.buildMultipartBody(MultipartBody.FORM, parts);
-        Response response = OkHttpUtils.sendPostRequest(serverUrl, null, null, requestBody);
-        return OkHttpUtils.getRespText(response);
+        RequestBody requestBody = okHttpUtils.buildMultipartBody(MultipartBody.FORM, parts);
+        Response response = okHttpUtils.sendPostRequest(serverUrl, null, null, requestBody);
+        return okHttpUtils.getRespText(response);
     }
 
 }

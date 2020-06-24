@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.HttpUrl;
@@ -28,8 +29,18 @@ public class OkHttpUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(OkHttpUtils.class);
 
-    public static OkHttpClient getHttpClient() {
-        return new OkHttpClient();
+    private Supplier<OkHttpClient> httpClientSupplier;
+
+    public OkHttpUtils() {
+        this(OkHttpClient::new);
+    }
+
+    public OkHttpUtils(Supplier<OkHttpClient> httpClientSupplier) {
+        this.httpClientSupplier = httpClientSupplier;
+    }
+
+    private OkHttpClient getHttpClient() {
+        return httpClientSupplier.get();
     }
 
     public static RequestBody buildRequestBody(MediaType contentType, byte[] content) {
@@ -77,7 +88,7 @@ public class OkHttpUtils {
         httpClient.newCall(request).enqueue(callback);
     }
 
-    public static Response sendRequest(String baseUrl, String method, Map<String, String> queryParams, Map<String, String> headers, RequestBody requestBody) throws IOException {
+    public Response sendRequest(String baseUrl, String method, Map<String, String> queryParams, Map<String, String> headers, RequestBody requestBody) throws IOException {
         OkHttpClient httpClient = getHttpClient();
         HttpUrl.Builder builder = HttpUrl.get(baseUrl).newBuilder();
         if (MapUtils.isNotEmpty(queryParams)) {
@@ -90,40 +101,40 @@ public class OkHttpUtils {
         return sendRequest(httpClient, request);
     }
 
-    public static Response sendGetRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers) throws IOException {
+    public Response sendGetRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers) throws IOException {
         return sendRequest(baseUrl, HttpMethods.GET, queryParams, headers, null);
     }
 
-    public static Response sendPostRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers, RequestBody requestBody) throws IOException {
+    public Response sendPostRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers, RequestBody requestBody) throws IOException {
         return sendRequest(baseUrl, HttpMethods.POST, queryParams, headers, requestBody);
     }
 
     public static byte[] getRespBytes(Response response) throws IOException {
-        if (response.isSuccessful()) {
-            ResponseBody body = response.body();
-            if (body != null) {
-                return body.bytes();
-            }
-        } else {
+        ResponseBody body = response.body();
+        byte[] bytes = new byte[0];
+        if (body != null) {
+            bytes = body.bytes();
+        }
+        if (!response.isSuccessful()) {
             String url = response.request().url().toString();
             int code = response.code();
             logger.error("{} request fail, code: {}", url, code);
         }
-        return new byte[0];
+        return bytes;
     }
 
     public static String getRespText(Response response) throws IOException {
-        if (response.isSuccessful()) {
-            ResponseBody body = response.body();
-            if (body != null) {
-                return body.string();
-            }
-        } else {
+        ResponseBody body = response.body();
+        String respText = "";
+        if (body != null) {
+            respText = body.string();
+        }
+        if (!response.isSuccessful()) {
             String url = response.request().url().toString();
             int code = response.code();
             logger.error("{} request fail, code: {}", url, code);
         }
-        return "";
+        return respText;
     }
 
 }
