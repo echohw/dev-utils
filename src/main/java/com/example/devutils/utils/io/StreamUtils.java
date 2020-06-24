@@ -140,11 +140,7 @@ public class StreamUtils {
 
     public static byte[] readAsBytes(InputStream inputStream, int batchSize) throws IOException {
         ByteArrayOutputStream outputStream = getByteArrayOutputStream();
-        byte[] bytes = new byte[batchSize];
-        int len;
-        while ((len = inputStream.read(bytes)) > 0) {
-            outputStream.write(bytes, 0, len);
-        }
+        copy(inputStream, outputStream, batchSize, null);
         return outputStream.toByteArray();
     }
 
@@ -162,11 +158,7 @@ public class StreamUtils {
 
     public static String readAsString(Reader reader, int batchSize) throws IOException {
         StringWriter writer = getStringWriter();
-        char[] chars = new char[batchSize];
-        int len;
-        while ((len = reader.read(chars)) > 0) {
-            writer.write(chars, 0, len);
-        }
+        copy(reader, writer, batchSize, null);
         return writer.toString();
     }
 
