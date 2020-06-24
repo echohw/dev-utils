@@ -7,6 +7,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
 /**
+ * NIO下的TCP操作工具类
  * Created by AMe on 2020-06-16 14:41.
  */
 public class NioNetTcpUtils {

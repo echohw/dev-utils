@@ -6,6 +6,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
 /**
+ * NIO下的缓冲区操作工具类
  * Created by AMe on 2020-06-12 14:09.
  */
 public class NioBufferUtils {

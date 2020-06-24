@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
+ * TCP操作工具类
  * Created by AMe on 2020-06-16 03:12.
  */
 public class NetTcpUtils {

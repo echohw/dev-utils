@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 路径操作工具类
  * Created by AMe on 2020-06-11 00:51.
  */
 public class PathUtils {

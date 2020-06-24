@@ -32,6 +32,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
+ * BIO下的流操作工具类
  * Created by AMe on 2020-06-20 15:21.
  */
 public class StreamUtils {

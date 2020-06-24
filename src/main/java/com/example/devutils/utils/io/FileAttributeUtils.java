@@ -18,6 +18,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.List;
 
 /**
+ * 文件属性操作工具类
  * Created by AMe on 2020-06-10 01:14.
  */
 public class FileAttributeUtils {

@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
+ * NIO下的通道操作工具类
  * Created by AMe on 2020-06-12 13:51.
  */
 public class NioChannelUtils {

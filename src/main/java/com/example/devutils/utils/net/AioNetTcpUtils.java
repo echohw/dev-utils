@@ -7,6 +7,7 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
+ * AIO模式下的TCP操作工具类
  * Created by AMe on 2020-06-16 14:49.
  */
 public class AioNetTcpUtils {

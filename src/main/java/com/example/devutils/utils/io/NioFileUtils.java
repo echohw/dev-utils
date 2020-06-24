@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
+ * NIO下的文件操作工具类
  * Created by AMe on 2020-06-12 14:00.
  */
 public class NioFileUtils {

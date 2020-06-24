@@ -6,6 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 /**
+ * Set集合操作工具类
  * Created by AMe on 2020-06-13 11:28.
  */
 public class SetUtils extends CollectionUtils {

@@ -15,6 +15,7 @@ import java.io.RandomAccessFile;
 import java.util.Collection;
 
 /**
+ * 文件随机读写操作工具类
  * Created by AMe on 2020-06-08 01:16.
  */
 public class RandomAccessFileUtils {

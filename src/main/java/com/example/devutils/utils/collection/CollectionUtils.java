@@ -12,6 +12,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * 单列集合操作通用工具类
+ * Created by AMe on 2020-06-13 11:28.
+ */
 public class CollectionUtils {
 
     public static boolean isEmpty(Collection<?> collection) {
