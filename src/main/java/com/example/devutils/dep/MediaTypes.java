@@ -19,6 +19,12 @@ public class MediaTypes {
     public static final String APPLICATION_STREAM_JSON = "application/stream+json";
     public static final String APPLICATION_XHTML_XML = "application/xhtml+xml";
     public static final String APPLICATION_XML = "application/xml";
+    public static final String APPLICATION_WORD_DOC = "application/msword";
+    public static final String APPLICATION_WORD_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+    public static final String APPLICATION_EXCEL_XLS = "application/vnd.ms-excel";
+    public static final String APPLICATION_EXCEL_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    public static final String APPLICATION_PPT_PPT = "application/vnd.ms-powerpoint";
+    public static final String APPLICATION_PPT_PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
     public static final String IMAGE_GIF = "image/gif";
     public static final String IMAGE_JPEG = "image/jpeg";
     public static final String IMAGE_PNG = "image/png";

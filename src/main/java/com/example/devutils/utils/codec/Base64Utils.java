@@ -1,6 +1,7 @@
 package com.example.devutils.utils.codec;
 
 import com.example.devutils.dep.Charsets;
+import com.example.devutils.dep.MediaTypes;
 import com.example.devutils.utils.text.StringUtils;
 import java.nio.charset.Charset;
 import java.util.Base64;
@@ -13,10 +14,6 @@ import java.util.Base64.Encoder;
 public class Base64Utils {
 
     private static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
-
-    private static final String IMG_TYPE_FLAG = "${img_type}";
-    private static final String SRC_PROP_PREFIX = "data:image/" + IMG_TYPE_FLAG +";base64,";
-    private static final String DEFAULT_IMG_TYPE = "jpeg";
 
     public static Encoder getEncoder() {
         return Base64.getEncoder();
@@ -89,9 +86,9 @@ public class Base64Utils {
     }
 
     public static String encodeImageToString(byte[] bytes, String imageType) {
-        imageType = StringUtils.isBlank(imageType) ? DEFAULT_IMG_TYPE : imageType;
+        imageType = StringUtils.isBlank(imageType) ? MediaTypes.IMAGE_JPEG : imageType;
         String base64Str = encodeToString(bytes);
-        return SRC_PROP_PREFIX.replace(IMG_TYPE_FLAG, imageType) + base64Str;
+        return "data:" + imageType + ";base64," + base64Str;
     }
 
 }
