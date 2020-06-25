@@ -23,27 +23,43 @@ import org.jooq.lambda.Unchecked;
  */
 public class ResponseUtils {
 
+    public static void redirect(HttpServletResponse response, String url) throws IOException {
+        response.sendRedirect(url);
+    }
+
+    public static void setHeaders(HttpServletResponse response, Map<String, String> respHeaders) {
+        if (MapUtils.isNotEmpty(respHeaders)) {
+            for (Entry<String, String> entry : respHeaders.entrySet()) {
+                response.setHeader(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     public static void writeText(HttpServletResponse response, String content) throws IOException {
-        response.setContentType(MediaTypes.TEXT_PLAIN);
+        writeText(response, content, MediaTypes.TEXT_PLAIN);
+    }
+
+    public static void writeText(HttpServletResponse response, String content, String contentType) throws IOException {
+        response.setContentType(contentType);
         response.setCharacterEncoding(Charsets.UTF_8.name());
         response.getWriter().write(content);
     }
 
     public static void writeWord(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, fileName, MediaTypes.APPLICATION_WORD_DOC);
+        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_WORD_DOC);
     }
 
     public static void writeExcel(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, fileName, MediaTypes.APPLICATION_EXCEL_XLS);
+        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_EXCEL_XLS);
     }
 
-    public static void writePdf(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, fileName, MediaTypes.APPLICATION_PDF);
+    public static void writePdf(HttpServletResponse response, File file, boolean attachment, String fileName) throws IOException {
+        writeFile(response, file, attachment, fileName, MediaTypes.APPLICATION_PDF);
     }
 
-    public static void writeFile(HttpServletResponse response, File file, String fileName, String contentType) throws IOException {
+    public static void writeFile(HttpServletResponse response, File file, boolean attachment, String fileName, String contentType) throws IOException {
         Map<String, String> respHeaders = MapUtils.of(LinkedHashMap::new,
-            "Content-Disposition", "attachment;filename=" + fileName,
+            "Content-Disposition", (attachment ? "attachment;" : "") + "filename=" + fileName,
             "Content-Length", file.length() + "",
             "Content-Type", contentType
         );
@@ -54,21 +70,17 @@ public class ResponseUtils {
         try (
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         ) {
-            writeFile(response, respHeaders, inputStream);
+            write(response, respHeaders, inputStream);
         }
     }
 
-    public static void writeFile(HttpServletResponse response, Map<String, String> respHeaders, InputStream inputStream) throws IOException {
-        writeFile(response, respHeaders, Unchecked.consumer(outputStream -> StreamUtils.copy(inputStream, outputStream)));
+    public static void write(HttpServletResponse response, Map<String, String> respHeaders, InputStream inputStream) throws IOException {
+        write(response, respHeaders, Unchecked.consumer(outputStream -> StreamUtils.copy(inputStream, outputStream)));
     }
 
-    public static void writeFile(HttpServletResponse response, Map<String, String> respHeaders, Consumer<OutputStream> consumer) throws IOException {
+    public static void write(HttpServletResponse response, Map<String, String> respHeaders, Consumer<OutputStream> consumer) throws IOException {
         response.reset();
-        if (MapUtils.isNotEmpty(respHeaders)) {
-            for (Entry<String, String> entry : respHeaders.entrySet()) {
-                response.setHeader(entry.getKey(), entry.getValue());
-            }
-        }
+        setHeaders(response, respHeaders);
         response.setCharacterEncoding(Charsets.UTF_8.name());
         try (
             ServletOutputStream outputStream = response.getOutputStream();
