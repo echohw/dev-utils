@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +28,7 @@ public class ResponseUtils {
 
     public static void setHeaders(HttpServletResponse response, Map<String, String> respHeaders) {
         if (MapUtils.isNotEmpty(respHeaders)) {
-            for (Entry<String, String> entry : respHeaders.entrySet()) {
-                response.setHeader(entry.getKey(), entry.getValue());
-            }
+            respHeaders.forEach(response::setHeader);
         }
     }
 

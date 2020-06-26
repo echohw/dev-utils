@@ -18,12 +18,20 @@ import org.joor.Reflect;
  */
 public class ReflectUtils {
 
-    public static Class<?> getClass(Object obj) {
-        return obj instanceof Class ? (Class) obj : obj.getClass();
+    public static <T> Class<? extends T> getClass(T obj) {
+        return (Class<? extends T>) obj.getClass();
     }
 
     public static Class<?> getClass(String className) throws ClassNotFoundException {
         return Class.forName(className);
+    }
+
+    public static <T> T newInstance(String className, Object[] args) {
+        return Reflect.onClass(className).create(args).get();
+    }
+
+    public static <T> T newInstance(Class<T> clazz, Object[] args) {
+        return Reflect.onClass(clazz).create(args).get();
     }
 
     public static boolean fieldExist(Class<?> clazz, String fieldName) {

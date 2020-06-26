@@ -34,9 +34,8 @@ public class CollectionUtils {
             List<K> keys = keysFunc.apply(item);
             if (keys != null && keys.size() > 0) {
                 for (K key : keys) {
-                    V v = Optional.ofNullable(map.get(key)).orElseGet(collectionSupplier);
+                    V v = map.computeIfAbsent(key, k -> collectionSupplier.get());
                     v.add(item);
-                    map.put(key, v);
                 }
             }
         }, M::putAll);

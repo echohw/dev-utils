@@ -5,7 +5,6 @@ import com.example.devutils.utils.collection.MapUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -50,9 +49,7 @@ public class OkHttpUtils {
     public static RequestBody buildFormBody(Map<String, String> formData) {
         FormBody.Builder builder = new FormBody.Builder();
         if (MapUtils.isNotEmpty(formData)) {
-            for (Entry<String, String> entry : formData.entrySet()) {
-                builder.add(entry.getKey(), entry.getValue());
-            }
+            formData.forEach(builder::add);
         }
         return builder.build();
     }
@@ -73,9 +70,7 @@ public class OkHttpUtils {
             .url(url)
             .method(method, body);
         if (MapUtils.isNotEmpty(headers)) {
-            for (Entry<String, String> entry : headers.entrySet()) {
-                builder.addHeader(entry.getKey(), entry.getValue());
-            }
+            headers.forEach(builder::addHeader);
         }
         return builder.build();
     }
@@ -92,9 +87,7 @@ public class OkHttpUtils {
         OkHttpClient httpClient = getHttpClient();
         HttpUrl.Builder builder = HttpUrl.get(baseUrl).newBuilder();
         if (MapUtils.isNotEmpty(queryParams)) {
-            for (Entry<String, String> entry : queryParams.entrySet()) {
-                builder.addQueryParameter(entry.getKey(), entry.getValue());
-            }
+            queryParams.forEach(builder::addQueryParameter);
         }
         HttpUrl httpUrl = builder.build();
         Request request = buildRequest(httpUrl, method, requestBody, headers);
