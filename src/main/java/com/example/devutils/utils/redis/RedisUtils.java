@@ -1,13 +1,10 @@
 package com.example.devutils.utils.redis;
 
 import com.example.devutils.utils.collection.CollectionUtils;
-import java.security.Key;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
