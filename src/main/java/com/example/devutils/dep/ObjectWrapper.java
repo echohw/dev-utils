@@ -1,8 +1,8 @@
 package com.example.devutils.dep;
 
 import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.function.BiPredicate;
+import java.util.function.ToIntFunction;
 
 /**
  * Created by AMe on 2020-06-18 16:40.
@@ -10,14 +10,14 @@ import java.util.function.Function;
 public class ObjectWrapper<T> {
 
     private T object;
-    private Function<T, Integer> hashCodeFunc;
-    private BiFunction<T, T, Boolean> equalsBiFunc;
+    private ToIntFunction<T> hashCodeFunc;
+    private BiPredicate<T, T> equalsPred;
     private boolean force = false;
 
-    public ObjectWrapper(T object, Function<T, Integer> hashCodeFunc, BiFunction<T, T, Boolean> equalsBiFunc) {
+    public ObjectWrapper(T object, ToIntFunction<T> hashCodeFunc, BiPredicate<T, T> equalsPred) {
         this.object = object;
         this.hashCodeFunc = hashCodeFunc;
-        this.equalsBiFunc = equalsBiFunc;
+        this.equalsPred = equalsPred;
     }
 
     public ObjectWrapper force(boolean force) {
@@ -31,7 +31,7 @@ public class ObjectWrapper<T> {
 
     @Override
     public int hashCode() {
-        return Optional.ofNullable(hashCodeFunc).map(func -> func.apply(object)).orElseGet(() -> object.hashCode());
+        return Optional.ofNullable(hashCodeFunc).map(func -> func.applyAsInt(object)).orElseGet(() -> object.hashCode());
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ObjectWrapper<T> {
         }
         if (object2.getClass() == object.getClass() || force) {
             Object o2 = object2;
-            return Optional.ofNullable(equalsBiFunc).map(func -> func.apply(object, (T) o2)).orElseGet(() -> object.equals(o2));
+            return Optional.ofNullable(equalsPred).map(func -> func.test(object, (T) o2)).orElseGet(() -> object.equals(o2));
         } else {
             return false;
         }

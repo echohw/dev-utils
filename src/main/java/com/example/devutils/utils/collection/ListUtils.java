@@ -1,8 +1,11 @@
 package com.example.devutils.utils.collection;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -38,4 +41,29 @@ public class ListUtils extends CollectionUtils {
         return list.stream().distinct().collect(Collectors.toCollection(supplier));
     }
 
+    /**
+     * 集合元素分组(元素在顺序上应该存在一定的关联)
+     * @param list 元素集
+     * @param predicate 关联断言函数
+     * @param <T> 元素类型
+     * @return List<ArrayList<Item>>
+     */
+    public static <T> List<ArrayList<T>> grouping(List<T> list, BiPredicate<T, T> predicate) {
+        if (list.size() < 2) {
+            return Collections.singletonList(new ArrayList<>(list));
+        }
+        List<ArrayList<T>> resList = new ArrayList<>();
+        int start = 0, end = 0;
+        for (int i = 1; i < list.size(); i++) {
+            end = i;
+            if (!predicate.test(list.get(i - 1), list.get(i))) {
+                resList.add(new ArrayList<>(list.subList(start, end)));
+                start = end;
+            }
+            if (i == list.size() - 1) {
+                resList.add(new ArrayList<>(list.subList(start, end + 1)));
+            }
+        }
+        return resList;
+    }
 }
