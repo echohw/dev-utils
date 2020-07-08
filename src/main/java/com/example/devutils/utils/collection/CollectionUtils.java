@@ -31,7 +31,7 @@ public class CollectionUtils {
      * 集合元素分组
      * @param collection 元素集
      * @param mapSupplier Map提供者
-     * @param collectionSupplier Collection提供者
+     * @param collectionFunc Collection提供者
      * @param keysFunc key的生成规则
      * @param <T> Collection中元素的类型
      * @param <K> Map中Key的类型
@@ -39,12 +39,12 @@ public class CollectionUtils {
      * @param <M> Map的类型
      * @return Map<Key, Collection<Item>>
      */
-    public static <T, K, V extends Collection<T>, M extends Map<K, V>> M grouping(Collection<T> collection, Supplier<M> mapSupplier, Supplier<V> collectionSupplier, Function<T, List<K>> keysFunc) {
+    public static <T, K, V extends Collection<T>, M extends Map<K, V>> M grouping(Collection<T> collection, Supplier<M> mapSupplier, Function<K, V> collectionFunc, Function<T, List<K>> keysFunc) {
         return collection.stream().collect(mapSupplier, (map, item) -> {
             List<K> keys = keysFunc.apply(item);
             if (isNotEmpty(keys)) {
                 for (K key : keys) {
-                    V v = map.computeIfAbsent(key, k -> collectionSupplier.get());
+                    V v = map.computeIfAbsent(key, collectionFunc);
                     v.add(item);
                 }
             }

@@ -4,9 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -18,6 +16,7 @@ import org.joor.Reflect;
  */
 public class ReflectUtils {
 
+    @SuppressWarnings("unchecked")
     public static <T> Class<? extends T> getClass(T obj) {
         return (Class<? extends T>) obj.getClass();
     }
@@ -38,30 +37,38 @@ public class ReflectUtils {
         return getAllFieldNames(clazz).contains(fieldName);
     }
 
-    public static Set<String> getAllFieldNames(Class<?> clazz) {
-        return getAllFields(clazz, false, false).stream().map(Field::getName).collect(Collectors.toCollection(LinkedHashSet::new));
+    public static List<String> getAllFieldNames(Class<?> clazz) {
+        return getAllFields(clazz, false, false).stream().map(Field::getName).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public static Set<Field> getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf) {
+    public static List<Field> getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf) {
         return getAllFields(clazz, onlyPublic, onlySelf, field -> true);
     }
 
-    public static Set<Field> getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf, Predicate<Field> fieldPredicate) {
-       return getAllFields(clazz, onlyPublic, onlySelf, fieldPredicate, LinkedHashSet::new);
+    public static List<Field> getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf, Predicate<Field> fieldPredicate) {
+       return getAllFields(clazz, onlyPublic, onlySelf, fieldPredicate, ArrayList::new);
     }
 
     public static <C extends Collection<Field>> C getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf, Predicate<Field> fieldPredicate, Supplier<C> collectionSupplier) {
         List<Stream<Field>> fieldStreamList = new ArrayList<>();
-        do {
+        while (clazz != null) {
             Stream<Field> fieldStream = Arrays.stream(onlyPublic ? clazz.getFields() : clazz.getDeclaredFields()).filter(fieldPredicate);
             fieldStreamList.add(fieldStream);
             clazz = onlySelf ? null : clazz.getSuperclass();
-        } while (clazz != null);
+        }
         return fieldStreamList.stream().flatMap(stream -> stream).collect(Collectors.toCollection(collectionSupplier));
     }
 
     public static <T> T getFieldValue(Object obj, String fieldName) {
         return Reflect.on(obj).get(fieldName);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(Object obj, Field field) throws IllegalAccessException {
+        if (!field.isAccessible()) {
+            field.setAccessible(true);
+        }
+        return (T) field.get(obj);
     }
 
     public static <T> T setFieldValue(Object obj, String fieldName, Object fieldValue) {
