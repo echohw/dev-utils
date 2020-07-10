@@ -12,12 +12,21 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by AMe on 2020-06-18 12:58.
  */
 public class TimeUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(TimeUtils.class);
 
     public static Date getNowDate() {
         return new Date();
@@ -141,6 +150,30 @@ public class TimeUtils {
 
     public static Date parseToDate(String dateStr, String pattern) throws ParseException {
         return TimeFormatterUtils.getSimpleDateFormat(pattern).parse(dateStr);
+    }
+
+    public static Date parseToDate(String dateStr, String pattern, Locale locale) throws ParseException {
+        return TimeFormatterUtils.getSimpleDateFormat(pattern, locale).parse(dateStr);
+    }
+
+    public static Date parseToDate(String dateStr, String... patterns) throws ParseException {
+        List<Tuple2<String, Locale>> tuple2s = Arrays.stream(patterns)
+            .map(pattern -> new Tuple2<>(pattern, TimeFormatterUtils.getDefaultLocale())).collect(Collectors.toList());
+        return parseToDate(dateStr, tuple2s);
+    }
+
+    public static Date parseToDate(String dateStr, List<Tuple2<String, Locale>> patternLocales) throws ParseException {
+        if (patternLocales.size() == 0) throw new IllegalArgumentException();
+        ParseException exception = null;
+        for (Tuple2<String, Locale> tuple2 : patternLocales) {
+            try {
+                return parseToDate(dateStr, tuple2.v1, tuple2.v2);
+            } catch (ParseException ex) {
+                exception = ex;
+                logger.error("Parsing failed, date:{}, pattern:{}", dateStr, tuple2.v1);
+            }
+        }
+        throw exception;
     }
 
     public static LocalDateTime parseToLocalDateTime(String dateTimeStr, String pattern) {

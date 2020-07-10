@@ -4,6 +4,7 @@ import com.example.devutils.utils.collection.CollectionUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import org.springframework.data.redis.connection.DataType;
@@ -19,7 +20,7 @@ public class RedisUtils<K, V> {
     private RedisTemplate<K, V> redisTemplate;
 
     public RedisUtils(RedisTemplate<K, V> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+        this.redisTemplate = Objects.requireNonNull(redisTemplate);
     }
 
     public Boolean del(K key) {
