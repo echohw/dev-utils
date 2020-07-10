@@ -23,6 +23,10 @@ public class RedisUtils<K, V> {
         this.redisTemplate = Objects.requireNonNull(redisTemplate);
     }
 
+    public RedisTemplate<K, V> redisTemplate() {
+        return redisTemplate;
+    }
+
     public Boolean del(K key) {
         return redisTemplate.delete(key);
     }
