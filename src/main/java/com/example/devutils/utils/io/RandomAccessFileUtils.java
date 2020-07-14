@@ -171,6 +171,7 @@ public class RandomAccessFileUtils {
             outputStream.write(bytes, 0, len);
             readCount += len;
         }
+        outputStream.flush();
         return readCount;
     }
 

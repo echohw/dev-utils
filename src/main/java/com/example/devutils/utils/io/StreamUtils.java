@@ -209,6 +209,7 @@ public class StreamUtils {
             noticeConsumer.accept(new Range<>(readCount + 1, readCount + len));
             readCount += len;
         }
+        outputStream.flush();
         return readCount;
     }
 
@@ -226,6 +227,7 @@ public class StreamUtils {
             noticeConsumer.accept(new Range<>(readCount + 1, readCount + len));
             readCount += len;
         }
+        writer.flush();
         return readCount;
     }
 
