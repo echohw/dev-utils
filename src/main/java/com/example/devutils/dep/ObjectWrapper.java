@@ -1,5 +1,6 @@
 package com.example.devutils.dep;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
@@ -15,7 +16,7 @@ public class ObjectWrapper<T> {
     private boolean force = false;
 
     public ObjectWrapper(T object, ToIntFunction<T> hashCodeFunc, BiPredicate<T, T> equalsPred) {
-        this.object = object;
+        this.object = Objects.requireNonNull(object);
         this.hashCodeFunc = hashCodeFunc;
         this.equalsPred = equalsPred;
     }
