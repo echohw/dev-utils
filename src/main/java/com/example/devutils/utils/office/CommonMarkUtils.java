@@ -2,6 +2,7 @@ package com.example.devutils.utils.office;
 
 import com.example.devutils.dep.MediaTypes;
 import com.example.devutils.utils.codec.Base64Utils;
+import com.example.devutils.utils.io.FileReader;
 import com.example.devutils.utils.text.StringUtils;
 import java.io.IOException;
 import java.io.Reader;
@@ -67,7 +68,7 @@ public class CommonMarkUtils {
                 Optional.ofNullable(attrs).ifPresent(attributes::putAll);
                 if (encodeImage) {
                     Optional.ofNullable(attributes.get("src")).filter(StringUtils::isNotBlank)
-                        .ifPresent(Unchecked.consumer(path -> attributes.put("src", Base64Utils.encodeImageToString(ImageUtils.readImage(path), MediaTypes.IMAGE_JPEG))));
+                        .ifPresent(Unchecked.consumer(path -> attributes.put("src", Base64Utils.encodeImageToString(FileReader.readFileAsBytes(path), MediaTypes.IMAGE_JPEG))));
                 }
             }
         };

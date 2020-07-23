@@ -50,16 +50,12 @@ public class ResponseUtils {
         writeFile(response, file, true, fileName, MediaTypes.APPLICATION_EXCEL_XLS);
     }
 
-    public static void writePdf(HttpServletResponse response, File file, boolean attachment, String fileName) throws IOException {
-        writeFile(response, file, attachment, fileName, MediaTypes.APPLICATION_PDF);
+    public static void writePdf(HttpServletResponse response, File file, boolean asAttachment, String fileName) throws IOException {
+        writeFile(response, file, asAttachment, fileName, MediaTypes.APPLICATION_PDF);
     }
 
-    public static void writeFile(HttpServletResponse response, File file, boolean attachment, String fileName, String contentType) throws IOException {
-        Map<String, String> respHeaders = MapUtils.of(LinkedHashMap::new,
-            "Content-Disposition", (attachment ? "attachment;" : "") + "filename=" + fileName,
-            "Content-Length", file.length() + "",
-            "Content-Type", contentType
-        );
+    public static void writeFile(HttpServletResponse response, File file, boolean asAttachment, String fileName, String contentType) throws IOException {
+        Map<String, String> respHeaders = getDownloadRespHeaders(asAttachment, fileName, file.length(), contentType);
         writeFile(response, respHeaders, file);
     }
 
@@ -84,6 +80,14 @@ public class ResponseUtils {
         ) {
             consumer.accept(outputStream);
         }
+    }
+
+    public static Map<String, String> getDownloadRespHeaders(boolean asAttachment, String fileName, long contentSize, String contentType) {
+        return MapUtils.of(LinkedHashMap::new,
+            "Content-Disposition", (asAttachment ? "attachment;" : "") + "filename=" + fileName,
+            "Content-Length", contentSize + "",
+            "Content-Type", contentType
+        );
     }
 
 }
