@@ -20,7 +20,7 @@ public class IdUtils {
 
     public static String nextUuid(boolean withSeparator) {
         String uuid = UUID.randomUUID().toString();
-        return withSeparator ? uuid : uuid.replaceAll("-", "");
+        return withSeparator ? uuid : uuid.replace("-", "");
     }
 
     public long nextSnowId() {

@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import org.jooq.lambda.Unchecked;
 
@@ -30,6 +31,17 @@ public class ResponseUtils {
         if (MapUtils.isNotEmpty(respHeaders)) {
             respHeaders.forEach(response::setHeader);
         }
+    }
+
+    public static void addCookie(HttpServletResponse response, String cookieName, String cookieValue, String path, int expiry) {
+        Cookie cookie = new Cookie(cookieName, cookieValue);
+        cookie.setPath(path);
+        cookie.setMaxAge(expiry);
+        response.addCookie(cookie);
+    }
+
+    public static void deleteCookie(HttpServletResponse response, String cookieName, String path) {
+        addCookie(response, cookieName, "", path, 0);
     }
 
     public static void writeText(HttpServletResponse response, String content) throws IOException {

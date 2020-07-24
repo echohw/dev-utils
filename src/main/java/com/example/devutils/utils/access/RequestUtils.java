@@ -3,7 +3,11 @@ package com.example.devutils.utils.access;
 import com.example.devutils.utils.text.StringUtils;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Optional;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.springframework.web.util.WebUtils;
 
 /**
  * Created by AMe on 2020-06-21 14:52.
@@ -47,6 +51,22 @@ public class RequestUtils {
 
     public static String getUserAgent(HttpServletRequest request) {
         return getHeader(request, "User-Agent");
+    }
+
+    public static String getCookieValue(HttpServletRequest request, String cookieName) {
+        return Optional.ofNullable(WebUtils.getCookie(request, cookieName)).map(Cookie::getValue).orElse(null);
+    }
+
+    public static HttpSession getSession(HttpServletRequest request, boolean create) {
+        return request.getSession(create);
+    }
+
+    public static String getSessionId(HttpServletRequest request) {
+        return Optional.ofNullable(getSession(request, false)).map(HttpSession::getId).orElse(null);
+    }
+
+    public static Object getSessionAttrValue(HttpServletRequest request, String attrName) {
+        return Optional.ofNullable(getSession(request, false)).map(session -> session.getAttribute(attrName)).orElse(null);
     }
 
 }

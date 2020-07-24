@@ -5,6 +5,7 @@ import com.example.devutils.utils.collection.MapUtils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -31,11 +32,12 @@ public class OkHttpUtils {
     private Supplier<OkHttpClient> httpClientSupplier;
 
     public OkHttpUtils() {
-        this(OkHttpClient::new);
+        OkHttpClient httpClient = new OkHttpClient();
+        this.httpClientSupplier = () -> httpClient;
     }
 
     public OkHttpUtils(Supplier<OkHttpClient> httpClientSupplier) {
-        this.httpClientSupplier = httpClientSupplier;
+        this.httpClientSupplier = Objects.requireNonNull(httpClientSupplier);
     }
 
     private OkHttpClient getHttpClient() {
