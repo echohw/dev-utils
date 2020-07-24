@@ -1,11 +1,8 @@
 package com.example.devutils.utils.office;
 
-import com.example.devutils.dep.Charsets;
 import com.example.devutils.dep.WkhtmlOptions;
 import com.example.devutils.utils.ProcessInvokeUtils;
-import com.example.devutils.utils.io.StreamUtils;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,19 +32,7 @@ public class WkhtmlUtils {
     }
 
     public static void render(String cmd) throws IOException, InterruptedException {
-        render(cmd, process -> {
-            try (
-                InputStream inputStream = process.getInputStream();
-                InputStream errorStream = process.getErrorStream();
-            ) {
-                String out = StreamUtils.readAsString(inputStream, Charsets.UTF_8);
-                String err = StreamUtils.readAsString(errorStream, Charsets.UTF_8);
-                logger.info("OutputStream: {}", out);
-                logger.info("ErrorStream: {}", err);
-            } catch (IOException ex) {
-                logger.error(ex.getMessage());
-            }
-        });
+        ProcessInvokeUtils.invoke(cmd);
     }
 
     public static void render(String cmd, Consumer<Process> consumer) throws IOException, InterruptedException {
