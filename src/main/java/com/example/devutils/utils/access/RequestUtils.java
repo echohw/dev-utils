@@ -1,14 +1,20 @@
 package com.example.devutils.utils.access;
 
+import com.example.devutils.dep.Charsets;
+import com.example.devutils.utils.codec.URLUtils;
+import com.example.devutils.utils.io.StreamUtils;
 import com.example.devutils.utils.text.StringUtils;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.jooq.lambda.Unchecked;
 
 /**
  * Created by AMe on 2020-06-21 14:52.
@@ -21,6 +27,19 @@ public class RequestUtils {
 
     public static String getUrl(HttpServletRequest request) {
         return request.getRequestURL().toString();
+    }
+
+    public static String getReqParams(HttpServletRequest request, String httpMethod) throws IOException {
+        if ("GET".equalsIgnoreCase(httpMethod)) {
+            return Optional.ofNullable(request.getQueryString()).map(queryStr -> Unchecked.supplier(() -> URLUtils.decode(queryStr, Charsets.UTF_8)).get()).orElse(null);
+        } else if ("POST".equalsIgnoreCase(httpMethod)) {
+            try (
+                ServletInputStream inputStream = request.getInputStream();
+            ) {
+                return StreamUtils.readAsString(inputStream, Charsets.UTF_8);
+            }
+        }
+        return null;
     }
 
     public static String getIp(HttpServletRequest request) {
