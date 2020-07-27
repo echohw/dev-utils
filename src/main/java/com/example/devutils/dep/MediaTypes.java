@@ -28,6 +28,8 @@ public class MediaTypes {
     public static final String IMAGE_GIF = "image/gif";
     public static final String IMAGE_JPEG = "image/jpeg";
     public static final String IMAGE_PNG = "image/png";
+    public static final String IMAGE_SVG = "image/svg+xml";
+    public static final String IMAGE_SVG_UTF8 = "image/svg+xml;charset=UTF-8";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String TEXT_EVENT_STREAM = "text/event-stream";
     public static final String TEXT_HTML = "text/html";

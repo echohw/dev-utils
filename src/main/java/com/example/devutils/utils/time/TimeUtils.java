@@ -185,11 +185,19 @@ public class TimeUtils {
     }
 
     public static String formatDate(Date date, String pattern) {
-        return TimeFormatterUtils.getSimpleDateFormat(pattern).format(date);
+        return formatDate(date, pattern, TimeFormatterUtils.getDefaultLocale());
+    }
+
+    public static String formatDate(Date date, String pattern, Locale locale) {
+        return TimeFormatterUtils.getSimpleDateFormat(pattern, locale).format(date);
     }
 
     public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern) {
-        return localDateTime.format(TimeFormatterUtils.getDateTimeFormatter(pattern));
+        return formatLocalDateTime(localDateTime, pattern, TimeFormatterUtils.getDefaultLocale());
+    }
+
+    public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern, Locale locale) {
+        return localDateTime.format(TimeFormatterUtils.getDateTimeFormatter(pattern, locale));
     }
 
     public static String formatInstant(Instant instant, String pattern) {
@@ -197,7 +205,11 @@ public class TimeUtils {
     }
 
     public static String formatInstant(Instant instant, String pattern, ZoneId zoneId) {
-        return TimeFormatterUtils.getDateTimeFormatter(pattern).withZone(zoneId).format(instant);
+        return formatInstant(instant, pattern, zoneId, TimeFormatterUtils.getDefaultLocale());
+    }
+
+    public static String formatInstant(Instant instant, String pattern, ZoneId zoneId, Locale locale) {
+        return TimeFormatterUtils.getDateTimeFormatter(pattern, locale).withZone(zoneId).format(instant);
     }
 
     public static long betweenDays(LocalDateTime startInclusive, LocalDateTime endExclusive) {

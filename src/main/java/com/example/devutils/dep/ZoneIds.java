@@ -9,6 +9,8 @@ public class ZoneIds {
 
     public static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
 
+    public static final ZoneId ZONE_GMT = ZoneId.of("GMT"); // 格林威治标准时间
+    public static final ZoneId ZONE_UTC = ZoneId.of("UTC"); // 协调世界时
     public static final ZoneId ZONE_SHANGHAI = ZoneId.of("Asia/Shanghai"); // 中国标准时间(北京)
     public static final ZoneId ZONE_HONG_KONG = ZoneId.of("Asia/Hong_Kong"); // 香港时间(香港)
     public static final ZoneId ZONE_TAIPEI = ZoneId.of("Asia/Taipei"); // 台北时间(台北)
