@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletInputStream;
@@ -15,11 +16,13 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.jooq.lambda.Unchecked;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 
 /**
  * Created by AMe on 2020-06-21 14:52.
  */
-public class RequestUtils {
+public class ServletRequestUtils {
 
     public static String getUri(HttpServletRequest request) {
         return request.getRequestURI();
@@ -29,17 +32,36 @@ public class RequestUtils {
         return request.getRequestURL().toString();
     }
 
+    public static String getQueryStr(HttpServletRequest request, boolean decode) {
+        String queryStr = Optional.ofNullable(request.getQueryString()).orElse("");
+        return decode ? Unchecked.supplier(() -> URLUtils.decode(queryStr, Charsets.UTF_8)).get() : queryStr;
+    }
+
+    public static MultiValueMap<String, String> getQueryParams(HttpServletRequest request) {
+        return CollectionUtils.toMultiValueMap(
+            request.getParameterMap().entrySet().stream().collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), Arrays.asList(entry.getValue())), LinkedHashMap::putAll)
+        );
+    }
+
+    public static byte[] getBodyAsBytes(HttpServletRequest request) throws IOException {
+        try (
+            ServletInputStream inputStream = request.getInputStream();
+        ) {
+            return StreamUtils.readAsBytes(inputStream);
+        }
+    }
+
+    public static String getBodyAsStr(HttpServletRequest request) throws IOException {
+        return new String(getBodyAsBytes(request), Charsets.UTF_8);
+    }
+
     public static String getReqParams(HttpServletRequest request, String httpMethod) throws IOException {
         if ("GET".equalsIgnoreCase(httpMethod)) {
-            return Optional.ofNullable(request.getQueryString()).map(queryStr -> Unchecked.supplier(() -> URLUtils.decode(queryStr, Charsets.UTF_8)).get()).orElse(null);
+            return getQueryStr(request, true);
         } else if ("POST".equalsIgnoreCase(httpMethod)) {
-            try (
-                ServletInputStream inputStream = request.getInputStream();
-            ) {
-                return StreamUtils.readAsString(inputStream, Charsets.UTF_8);
-            }
+            return getBodyAsStr(request);
         }
-        return null;
+        return "";
     }
 
     public static String getIp(HttpServletRequest request) {

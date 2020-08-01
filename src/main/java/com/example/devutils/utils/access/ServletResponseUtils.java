@@ -21,7 +21,7 @@ import org.jooq.lambda.Unchecked;
 /**
  * Created by AMe on 2020-06-22 14:39.
  */
-public class ResponseUtils {
+public class ServletResponseUtils {
 
     public static void redirect(HttpServletResponse response, String url) throws IOException {
         response.sendRedirect(url);
@@ -55,11 +55,11 @@ public class ResponseUtils {
     }
 
     public static void writeWord(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_WORD_DOC);
+        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_WORD_DOCX);
     }
 
     public static void writeExcel(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_EXCEL_XLS);
+        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_EXCEL_XLSX);
     }
 
     public static void writePdf(HttpServletResponse response, File file, boolean asAttachment, String fileName) throws IOException {
