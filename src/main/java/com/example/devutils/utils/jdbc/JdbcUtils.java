@@ -10,13 +10,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.ToLongFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.RowMapperResultSetExtractor;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.KeyHolder;
@@ -104,46 +109,53 @@ public class JdbcUtils {
         return jdbcTemplate.update(sql, args, argTypes);
     }
 
-    public <T> T selectValue(String sql, Class<T> clazz) {
-        return jdbcTemplate.queryForObject(sql, clazz);
+    public <T> Optional<T> selectValue(String sql, Class<T> clazz) {
+        List<T> results = jdbcTemplate.query(sql, new SingleColumnRowMapper<>(clazz));
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public <T> T selectValue(String sql, Object[] values, int[] valueTypes, Class<T> clazz) {
-        return jdbcTemplate.queryForObject(sql, values, valueTypes, clazz);
+    public <T> Optional<T> selectValue(String sql, Object[] values, int[] valueTypes, Class<T> clazz) {
+        List<T> results = jdbcTemplate.query(sql, values, valueTypes, new RowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(clazz), 1));
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public Map<String, Object> selectRow(String sql) {
-        return jdbcTemplate.queryForMap(sql);
+    public Optional<Map<String, Object>> selectRow(String sql) {
+        List<Map<String, Object>> results = jdbcTemplate.query(sql, new ColumnMapRowMapper());
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public Map<String, Object> selectRow(String sql, Object[] values, int[] valueTypes) {
-        return jdbcTemplate.queryForMap(sql, values, valueTypes);
+    public Optional<Map<String, Object>> selectRow(String sql, Object[] values, int[] valueTypes) {
+        List<Map<String, Object>> results = jdbcTemplate.query(sql, values, valueTypes, new RowMapperResultSetExtractor<>(new ColumnMapRowMapper(), 1));
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public <T> T selectRow(String sql, Class<T> clazz) {
+    public <T> Optional<T> selectRow(String sql, Class<T> clazz) {
         return selectRow(sql, new BeanPropertyRowMapper<>(clazz));
     }
 
-    public <T> T selectRow(String sql, RowMapper<T> rowMapper) {
-        return jdbcTemplate.queryForObject(sql, rowMapper);
+    public <T> Optional<T> selectRow(String sql, RowMapper<T> rowMapper) {
+        List<T> results = jdbcTemplate.query(sql, rowMapper);
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public <T> T selectRow(String sql, Object[] values, int[] valueTypes, Class<T> clazz) {
+    public <T> Optional<T> selectRow(String sql, Object[] values, int[] valueTypes, Class<T> clazz) {
         return selectRow(sql, values, valueTypes, new BeanPropertyRowMapper<>(clazz));
     }
 
-    public <T> T selectRow(String sql, Object[] values, int[] valueTypes, RowMapper<T> rowMapper) {
-        return jdbcTemplate.queryForObject(sql, values, valueTypes, rowMapper);
+    public <T> Optional<T> selectRow(String sql, Object[] values, int[] valueTypes, RowMapper<T> rowMapper) {
+        List<T> results = jdbcTemplate.query(sql, values, valueTypes, new RowMapperResultSetExtractor<>(rowMapper, 1));
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
-    public <T> T selectRow(String namedSql, T entity, Class<T> clazz) {
+    public <T> Optional<T> selectRow(String namedSql, T entity, Class<T> clazz) {
         return selectRow(namedSql, entity, new BeanPropertyRowMapper<>(clazz));
     }
 
-    public <T> T selectRow(String namedSql, T entity, RowMapper<T> rowMapper) {
+    public <T> Optional<T> selectRow(String namedSql, T entity, RowMapper<T> rowMapper) {
         NamedParameterJdbcTemplate namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate.getDataSource());
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(Objects.requireNonNull(entity));
-        return namedParameterJdbcTemplate.queryForObject(namedSql, parameterSource, rowMapper);
+        List<T> results = namedParameterJdbcTemplate.query(namedSql, parameterSource, rowMapper);
+        return Optional.ofNullable(DataAccessUtils.singleResult(results));
     }
 
     public <T> List<T> selectColumn(String sql, Class<T> clazz) {
@@ -189,11 +201,11 @@ public class JdbcUtils {
     }
 
     public <T> Page<T> selectPage(String sqlWithNoLimit, Class<T> clazz, int page, int size) {
-        return selectPage(sqlWithNoLimit, sql -> selectValue(sql, Long.class), sql -> selectRows(sql, clazz), page, size);
+        return selectPage(sqlWithNoLimit, sql -> selectValue(sql, Long.class).get(), sql -> selectRows(sql, clazz), page, size);
     }
 
     public <T> Page<T> selectPage(String sqlWithNoLimit, Object[] values, int[] valueTypes, Class<T> clazz, int page, int size) {
-        return selectPage(sqlWithNoLimit, sql -> selectValue(sql, values, valueTypes, Long.class), sql -> selectRows(sql, values, valueTypes, clazz), page, size);
+        return selectPage(sqlWithNoLimit, sql -> selectValue(sql, values, valueTypes, Long.class).get(), sql -> selectRows(sql, values, valueTypes, clazz), page, size);
     }
 
     private <T> Page<T> selectPage(String sqlWithNoLimit, ToLongFunction<String> countSupplier, Function<String, List<T>> contentSupplier, int page, int size) {
