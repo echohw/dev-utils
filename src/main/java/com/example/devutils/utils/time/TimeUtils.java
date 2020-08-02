@@ -128,6 +128,15 @@ public class TimeUtils {
         return localDateTime.plus(amountToAdd, unit);
     }
 
+    public static Instant plus(Instant instant, int amountToAdd, TemporalUnit unit) {
+        return instant.plus(amountToAdd, unit);
+    }
+
+    public static Date plus(Date date, int amountToAdd, TemporalUnit unit) {
+        Instant instant = plus(date.toInstant(), amountToAdd, unit);
+        return toDate(instant);
+    }
+
     public static LocalDateTime adjustToYear(LocalDateTime localDateTime, int year) {
         return localDateTime.withYear(year);
     }

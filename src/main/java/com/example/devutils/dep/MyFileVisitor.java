@@ -5,8 +5,10 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import org.jooq.lambda.Unchecked;
 
 /**
  * Created by AMe on 2020-07-08 17:09.
@@ -15,10 +17,16 @@ public class MyFileVisitor<T> extends SimpleFileVisitor<T> {
 
     private Predicate<T> scanPredicate;
     private Consumer<T> fileConsumer;
+    private BiFunction<T, IOException, FileVisitResult> failedHandler;
 
     public MyFileVisitor(Predicate<T> scanPredicate, Consumer<T> fileConsumer) {
+        this(scanPredicate, fileConsumer, Unchecked.biFunction((path, ex) -> {throw ex;}));
+    }
+
+    public MyFileVisitor(Predicate<T> scanPredicate, Consumer<T> fileConsumer, BiFunction<T, IOException, FileVisitResult> failedHandler) {
         this.scanPredicate = Objects.requireNonNull(scanPredicate);
         this.fileConsumer = Objects.requireNonNull(fileConsumer);
+        this.failedHandler = Objects.requireNonNull(failedHandler);
     }
 
     @Override
@@ -34,7 +42,7 @@ public class MyFileVisitor<T> extends SimpleFileVisitor<T> {
 
     @Override
     public FileVisitResult visitFileFailed(T file, IOException exc) throws IOException {
-        return super.visitFileFailed(file, exc);
+        return this.failedHandler.apply(file, exc);
     }
 
     @Override

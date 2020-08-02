@@ -83,7 +83,7 @@ public class ServletRequestUtils {
         return request.getHeader(headerName);
     }
 
-    public static ArrayList<String> getHeaders(HttpServletRequest request, String headerName) {
+    public static List<String> getHeaders(HttpServletRequest request, String headerName) {
         Enumeration<String> headers = request.getHeaders(headerName);
         ArrayList<String> headerList = new ArrayList<>();
         while (headers.hasMoreElements()) {
