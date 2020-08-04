@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
@@ -12,6 +13,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * 单列集合操作通用工具类
@@ -31,7 +34,7 @@ public class CollectionUtils {
      * 集合元素分组
      * @param collection 元素集
      * @param mapSupplier Map提供者
-     * @param collectionFunc Collection提供者
+     * @param collectionSupplier Collection提供者
      * @param keysFunc key的生成规则
      * @param <T> Collection中元素的类型
      * @param <K> Map中Key的类型
@@ -39,12 +42,12 @@ public class CollectionUtils {
      * @param <M> Map的类型
      * @return Map<Key, Collection<Item>>
      */
-    public static <T, K, V extends Collection<T>, M extends Map<K, V>> M grouping(Collection<T> collection, Supplier<M> mapSupplier, Function<K, V> collectionFunc, Function<T, List<K>> keysFunc) {
+    public static <T, K, V extends Collection<T>, M extends Map<K, V>> M grouping(Collection<T> collection, Supplier<M> mapSupplier, Function<K, V> collectionSupplier, Function<T, List<K>> keysFunc) {
         return collection.stream().collect(mapSupplier, (map, item) -> {
             List<K> keys = keysFunc.apply(item);
             if (isNotEmpty(keys)) {
                 for (K key : keys) {
-                    V v = map.computeIfAbsent(key, collectionFunc);
+                    V v = map.computeIfAbsent(key, collectionSupplier);
                     v.add(item);
                 }
             }
@@ -68,20 +71,20 @@ public class CollectionUtils {
 
     /**
      * 集合元素拉平
-     * @param collection 元素集
+     * @param collections 元素集
      * @param collectionSupplier Collection提供者
      * @param <T> Collection中元素的类型
      * @param <I> Collection中元素的类型
      * @param <R> Collection的类型
      * @return Collection<Item>
      */
-    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, Collection<T> collection) {
-        return collection.stream().flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
+    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, Collection<T> collections) {
+        return collections.stream().flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
     }
 
     @SafeVarargs
-    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, T... collection) {
-        return Arrays.stream(collection).flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
+    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, T... collections) {
+        return Arrays.stream(collections).flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
     }
 
     /**
@@ -102,25 +105,26 @@ public class CollectionUtils {
     /**
      * 计算交集
      */
-    public static <I, C extends Collection<I>> C intersection(Collection<I> c1, Collection<I> c2, Supplier<C> collectionSupplier) {
-        HashSet<I> hashSet = new HashSet<>(c2);
-        return c1.stream().filter(hashSet::contains).collect(Collectors.toCollection(collectionSupplier));
+    @SafeVarargs
+    public static <I, C extends Collection<I>, R extends Collection<I>> R intersection(Supplier<R> collectionSupplier, C... collections) {
+        return Arrays.stream(collections).map(Collection::stream).reduce((s1, s2) -> {
+            HashSet<I> hashSet = s2.collect(Collectors.toCollection(HashSet::new));
+            return s1.filter(hashSet::contains);
+        }).orElse(Stream.empty()).collect(Collectors.toCollection(collectionSupplier));
     }
 
     /**
      * 计算并集
      */
-    public static <I, C extends Collection<I>> C union(Collection<I> c1, Collection<I> c2, Supplier<C> collectionSupplier) {
-        C c = collectionSupplier.get();
-        c.addAll(c1);
-        c.addAll(c2);
-        return c;
+    @SafeVarargs
+    public static <I, C extends Collection<I>, R extends Collection<I>> R union(Supplier<R> collectionSupplier, C... collections) {
+        return Arrays.stream(collections).flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
     }
 
     /**
      * 计算差集
      */
-    public static <I, C extends Collection<I>> C subtract(Collection<I> c1, Collection<I> c2, Supplier<C> collectionSupplier) {
+    public static <I, C extends Collection<I>> C subtract(Supplier<C> collectionSupplier, Collection<I> c1, Collection<I> c2) {
         HashSet<I> hashSet = new HashSet<>(c2);
         return c1.stream().filter(item -> !hashSet.contains(item)).collect(Collectors.toCollection(collectionSupplier));
     }
@@ -130,5 +134,15 @@ public class CollectionUtils {
      */
     public static <T> List<List<T>> combine(Collection<T> c1, Collection<T> c2) {
         return c1.stream().flatMap(item1 -> c2.stream().map(item2 -> Arrays.asList(item1, item2))).collect(Collectors.toList());
+    }
+
+    /**
+     * 将每个Collection中对应位置的元素进行打包
+     */
+    @SafeVarargs
+    public static <I, C extends Collection<I>, R extends Collection<I>> List<R> zip(Supplier<R> collectionSupplier, C... collections) {
+        int min = Arrays.stream(collections).mapToInt(Collection::size).min().orElse(0);
+        List<Iterator<I>> iteratorList = Arrays.stream(collections).map(Collection::iterator).collect(Collectors.toList());
+        return IntStream.range(0, min).boxed().map(t_ -> iteratorList.stream().map(Iterator::next).collect(Collectors.toCollection(collectionSupplier))).collect(Collectors.toList());
     }
 }

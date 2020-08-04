@@ -1,7 +1,6 @@
 package com.example.devutils.utils.collection;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -76,15 +75,5 @@ public class ListUtils extends CollectionUtils {
             }
         }
         return resList;
-    }
-
-    /**
-     * 将每个List中对应位置的元素进行打包
-     */
-    @SafeVarargs
-    public static <I, C extends List<I>> List<ArrayList<I>> zip(C... lists) {
-        int min = Arrays.stream(lists).mapToInt(List::size).min().orElse(0);
-        return IntStream.range(0, min).boxed().map(idx -> Arrays.stream(lists).map(list -> list.get(idx))
-            .collect(Collectors.toCollection(ArrayList::new))).collect(Collectors.toList());
     }
 }
