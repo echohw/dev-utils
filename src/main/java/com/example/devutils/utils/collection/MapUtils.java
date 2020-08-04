@@ -24,6 +24,7 @@ public class MapUtils {
         return !isEmpty(map);
     }
 
+    @SuppressWarnings(value = "unchecked")
     public static <I, K, V, M extends Map<K, V>> M of(Supplier<M> mapSupplier, I... items) {
         M map = mapSupplier.get();
         int len = items.length;
@@ -45,7 +46,8 @@ public class MapUtils {
     /**
      * 泛型擦除转换
      */
-    public static <K, V, M extends Map<K, V>> M actual(Map map, Supplier<M> templateSupplier) {
+    @SuppressWarnings(value = "unchecked")
+    public static <K, V, M extends Map<K, V>> M actual(Map map) {
         return (M) map;
     }
 

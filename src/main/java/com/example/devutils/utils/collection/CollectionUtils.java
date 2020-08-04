@@ -110,7 +110,7 @@ public class CollectionUtils {
     /**
      * 计算并集
      */
-    public static <I, C extends Collection<I>> C union(Collection<I> c1, Collection c2, Supplier<C> collectionSupplier) {
+    public static <I, C extends Collection<I>> C union(Collection<I> c1, Collection<I> c2, Supplier<C> collectionSupplier) {
         C c = collectionSupplier.get();
         c.addAll(c1);
         c.addAll(c2);

@@ -35,6 +35,7 @@ public class ObjectWrapper<T> {
         return Optional.ofNullable(hashCodeFunc).map(func -> func.applyAsInt(object)).orElseGet(() -> object.hashCode());
     }
 
+    @SuppressWarnings(value = "unchecked")
     @Override
     public boolean equals(Object object2) {
         if (object2 instanceof ObjectWrapper) {

@@ -22,6 +22,7 @@ public class ObjectUtils {
         return byteOut.toByteArray();
     }
 
+    @SuppressWarnings(value = "unchecked")
     public static <T extends Serializable> T readObject(byte[] objByteArr) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteIn = new ByteArrayInputStream(objByteArr);
         try (
