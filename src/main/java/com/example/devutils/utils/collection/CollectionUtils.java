@@ -1,13 +1,18 @@
 package com.example.devutils.utils.collection;
 
 import com.example.devutils.dep.ObjectWrapper;
+import com.example.devutils.utils.id.IdUtils;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -52,6 +57,26 @@ public class CollectionUtils {
                 }
             }
         }, M::putAll);
+    }
+
+    /**
+     * 集合元素分组(元素在顺序上应该存在一定的关联)
+     * @param collection 元素集
+     * @param predicate 关联断言函数
+     * @param <T> 元素类型
+     * @return List<Collection<Item>>
+     */
+    public static <T, C extends Collection<T>> List<C> grouping(Collection<T> collection, BiPredicate<T, T> predicate, Supplier<C> collectionSupplier) {
+        AtomicReference<T> preRef = new AtomicReference<>();
+        AtomicReference<String> strRef = new AtomicReference<>();
+        Function<T, List<String>> keysFunc = item -> {
+            if (strRef.get() == null || !predicate.test(preRef.get(), item)) {
+                strRef.set(IdUtils.nextUuid());
+            }
+            preRef.set(item);
+            return Collections.singletonList(strRef.get());
+        };
+        return new ArrayList<>(grouping(collection, LinkedHashMap::new, k -> collectionSupplier.get(), keysFunc).values());
     }
 
     /**
