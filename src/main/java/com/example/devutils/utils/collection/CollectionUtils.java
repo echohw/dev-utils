@@ -75,8 +75,13 @@ public class CollectionUtils {
      * @param <R> Collection的类型
      * @return Collection<Item>
      */
-    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Collection<T> collection, Supplier<R> collectionSupplier) {
+    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, Collection<T> collection) {
         return collection.stream().flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
+    }
+
+    @SafeVarargs
+    public static <T extends Collection<I>, I, R extends Collection<I>> R flat(Supplier<R> collectionSupplier, T... collection) {
+        return Arrays.stream(collection).flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
     }
 
     /**
