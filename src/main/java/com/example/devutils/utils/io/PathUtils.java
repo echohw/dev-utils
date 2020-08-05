@@ -28,6 +28,10 @@ public class PathUtils {
         return homeDirectory.toPath();
     }
 
+    public static Path getSystemDrive() {
+        return getDesktopPath().getRoot();
+    }
+
     public static List<Path> getAllParentPath(Path path) {
         LinkedList<Path> parentPathList = new LinkedList<>();
         while ((path = path.getParent()) != null) {
