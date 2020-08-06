@@ -1,6 +1,7 @@
 package com.example.devutils.utils.jdbc.domain;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import lombok.Data;
@@ -25,7 +26,7 @@ public class PageImpl<T> implements Page<T> {
     }
 
     public PageImpl(List<T> content) {
-        this(content, Pageable.unpaged(), null == content ? 0 : content.size());
+        this(content == null ? Collections.emptyList() : content, Pageable.unpaged(), null == content ? 0 : content.size());
     }
 
     @Override

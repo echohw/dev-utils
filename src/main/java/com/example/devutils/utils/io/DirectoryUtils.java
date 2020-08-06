@@ -31,12 +31,14 @@ public class DirectoryUtils {
 
     public static Path createPlaceDir(Path filePath) throws IOException {
         Path parentPath = filePath.isAbsolute() ? filePath.getParent() : filePath.toAbsolutePath().getParent();
-        return createDir(parentPath);
+        if (parentPath != null) createDir(parentPath);
+        return parentPath;
     }
 
     public static Path createPlaceDirs(Path filePath) throws IOException {
         Path parentPath = filePath.isAbsolute() ? filePath.getParent() : filePath.toAbsolutePath().getParent();
-        return createDirs(parentPath);
+        if (parentPath != null) createDirs(parentPath);
+        return parentPath;
     }
 
     public static Path createTempDir(String prefix) throws IOException {
