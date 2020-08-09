@@ -1,6 +1,6 @@
 package com.example.devutils.utils.io;
 
-import com.example.devutils.inter.Process;
+import com.example.devutils.inter.Progress;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileSystems;
@@ -71,7 +71,7 @@ public class DirectoryUtils {
         return watchService;
     }
 
-    public static <R> void copy(Path srcDirPath, Path destDirPath, Process<Path, R> process, CopyOption... options) throws IOException {
+    public static <R> void copy(Path srcDirPath, Path destDirPath, Progress<Path, R, Void> process, CopyOption... options) throws IOException {
         createDirs(destDirPath);
         walkFileTree(srcDirPath, new SimpleFileVisitor<Path>() {
             @Override
