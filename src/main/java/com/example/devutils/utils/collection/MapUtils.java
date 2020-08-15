@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BinaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -59,10 +60,18 @@ public class MapUtils {
     }
 
     /**
-     * 拉平
+     * 合并Map元素
      */
-    public static <K, V extends Collection<VI>, VI, R extends Collection<VI>> R flat(Map<K, V> map, Supplier<R> supplier) {
-        return map.values().stream().flatMap(Collection::stream).collect(Collectors.toCollection(supplier));
+    @SafeVarargs
+    public static <K, V, M extends Map<K, V>> M merge(Supplier<M> mapSupplier, BinaryOperator<V> mergeFunc, Map<K, V>... maps) {
+        return Arrays.stream(maps).flatMap(map -> map.entrySet().stream()).collect(mapSupplier, (map, entry) -> {
+            map.put(entry.getKey(), map.containsKey(entry.getKey()) ? mergeFunc.apply(map.get(entry.getKey()), entry.getValue()) : entry.getValue());
+        }, M::putAll);
     }
 
+    public static <K, V, M extends Map<K, V>> M merge(Supplier<M> mapSupplier, BinaryOperator<V> mergeFunc, Collection<? extends Map<K, V>> maps) {
+        return maps.stream().flatMap(map -> map.entrySet().stream()).collect(mapSupplier, (map, entry) -> {
+            map.put(entry.getKey(), map.containsKey(entry.getKey()) ? mergeFunc.apply(map.get(entry.getKey()), entry.getValue()) : entry.getValue());
+        }, M::putAll);
+    }
 }
