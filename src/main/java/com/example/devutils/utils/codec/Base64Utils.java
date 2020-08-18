@@ -77,7 +77,6 @@ public class Base64Utils {
         return decode(base64Str.getBytes(DEFAULT_CHARSET));
     }
 
-
     public static byte[] decodeFromUrlString(String base64Str) {
         if (base64Str.isEmpty()) {
             return new byte[0];

@@ -174,6 +174,7 @@ public class StreamUtils {
 
     public static int writeBytes(OutputStream outputStream, byte[] bytes) throws IOException {
         outputStream.write(bytes);
+        outputStream.flush();
         return bytes.length;
     }
 
@@ -184,6 +185,7 @@ public class StreamUtils {
 
     public static int writeString(Writer writer, String content) throws IOException {
         writer.write(content);
+        writer.flush();
         return content.length();
     }
 
@@ -192,6 +194,7 @@ public class StreamUtils {
             bufferedWriter.write(line);
             bufferedWriter.newLine();
         }
+        bufferedWriter.flush();
         return lineList.size();
     }
 

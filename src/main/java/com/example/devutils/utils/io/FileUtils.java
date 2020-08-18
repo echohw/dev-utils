@@ -39,7 +39,7 @@ public class FileUtils {
     public static String getExtName(String fileName) {
         int posi;
         if (StringUtils.isBlank(fileName) || (posi = fileName.lastIndexOf(".")) == -1 || posi == fileName.length() - 1) {
-            return null;
+            return "";
         }
         return fileName.substring(posi + 1);
     }

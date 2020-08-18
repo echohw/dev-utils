@@ -48,6 +48,14 @@ public class ServletResponseUtils {
         writeText(response, content, MediaTypes.TEXT_PLAIN);
     }
 
+    public static void writeHtml(HttpServletResponse response, String content) throws IOException {
+        writeText(response, content, MediaTypes.TEXT_HTML);
+    }
+
+    public static void writeJson(HttpServletResponse response, String content) throws IOException {
+        writeText(response, content, MediaTypes.APPLICATION_JSON_UTF8);
+    }
+
     public static void writeText(HttpServletResponse response, String content, String contentType) throws IOException {
         response.setContentType(contentType);
         response.setCharacterEncoding(Charsets.UTF_8.name());
@@ -64,6 +72,10 @@ public class ServletResponseUtils {
 
     public static void writePdf(HttpServletResponse response, File file, boolean asAttachment, String fileName) throws IOException {
         writeFile(response, file, asAttachment, fileName, MediaTypes.APPLICATION_PDF);
+    }
+
+    public static void writeImg(HttpServletResponse response, File file, boolean asAttachment, String fileName, String contentType) throws IOException {
+        writeFile(response, file, asAttachment, fileName, contentType);
     }
 
     public static void writeFile(HttpServletResponse response, File file, boolean asAttachment, String fileName, String contentType) throws IOException {
