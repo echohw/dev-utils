@@ -34,11 +34,19 @@ public class ReflectUtils {
     }
 
     public static boolean fieldExist(Class<?> clazz, String fieldName) {
-        return getAllFieldNames(clazz).contains(fieldName);
+        return fieldExist(clazz, fieldName, false, false);
+    }
+
+    public static boolean fieldExist(Class<?> clazz, String fieldName, boolean onlyPublic, boolean onlySelf) {
+        return getAllFieldNames(clazz, onlyPublic, onlySelf).contains(fieldName);
     }
 
     public static List<String> getAllFieldNames(Class<?> clazz) {
-        return getAllFields(clazz, false, false).stream().map(Field::getName).collect(Collectors.toCollection(ArrayList::new));
+        return getAllFieldNames(clazz, false, false);
+    }
+
+    public static List<String> getAllFieldNames(Class<?> clazz, boolean onlyPublic, boolean onlySelf) {
+        return getAllFields(clazz, onlyPublic, onlySelf).stream().map(Field::getName).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static List<Field> getAllFields(Class<?> clazz, boolean onlyPublic, boolean onlySelf) {

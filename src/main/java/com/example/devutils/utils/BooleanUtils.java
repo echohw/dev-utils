@@ -10,6 +10,10 @@ public class BooleanUtils {
     }
 
     public static boolean isFalse(Boolean value) {
+        return value != null && !value;
+    }
+
+    public static boolean isNullOrFalse(Boolean value) {
         return !isTrue(value);
     }
 
