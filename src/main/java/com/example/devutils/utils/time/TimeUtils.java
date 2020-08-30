@@ -2,6 +2,7 @@ package com.example.devutils.utils.time;
 
 import com.example.devutils.dep.ZoneIds;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
@@ -197,11 +199,15 @@ public class TimeUtils {
 
     /* ====================解析==================== */
     public static Date parseToDate(String dateStr, String pattern) throws ParseException {
-        return TimeFormatterUtils.getSimpleDateFormat(pattern).parse(dateStr);
+        return parseToDate(dateStr, TimeFormatterUtils.getSimpleDateFormat(pattern));
     }
 
     public static Date parseToDate(String dateStr, String pattern, Locale locale) throws ParseException {
-        return TimeFormatterUtils.getSimpleDateFormat(pattern, locale).parse(dateStr);
+        return parseToDate(dateStr, TimeFormatterUtils.getSimpleDateFormat(pattern, locale));
+    }
+
+    public static Date parseToDate(String dateStr, SimpleDateFormat simpleDateFormat) throws ParseException {
+        return simpleDateFormat.parse(dateStr);
     }
 
     public static Date parseToDate(String dateStr, String... patterns) throws ParseException {
@@ -227,7 +233,15 @@ public class TimeUtils {
     }
 
     public static LocalDateTime parseToLocalDateTime(String dateTimeStr, String pattern) {
-        return LocalDateTime.parse(dateTimeStr, TimeFormatterUtils.getDateTimeFormatter(pattern));
+        return parseToLocalDateTime(dateTimeStr, TimeFormatterUtils.getDateTimeFormatter(pattern));
+    }
+
+    public static LocalDateTime parseToLocalDateTime(String dateTimeStr, String pattern, Locale locale) {
+        return parseToLocalDateTime(dateTimeStr, TimeFormatterUtils.getDateTimeFormatter(pattern, locale));
+    }
+
+    public static LocalDateTime parseToLocalDateTime(String dateTimeStr, DateTimeFormatter dateTimeFormatter) {
+        return LocalDateTime.parse(dateTimeStr, dateTimeFormatter);
     }
 
     public static Instant parseToInstant(String instantStr) {
@@ -240,19 +254,27 @@ public class TimeUtils {
 
     /* ====================格式化==================== */
     public static String formatDate(Date date, String pattern) {
-        return formatDate(date, pattern, TimeFormatterUtils.getDefaultLocale());
+        return formatDate(date, TimeFormatterUtils.getSimpleDateFormat(pattern));
     }
 
     public static String formatDate(Date date, String pattern, Locale locale) {
-        return TimeFormatterUtils.getSimpleDateFormat(pattern, locale).format(date);
+        return formatDate(date, TimeFormatterUtils.getSimpleDateFormat(pattern, locale));
+    }
+
+    public static String formatDate(Date date, SimpleDateFormat simpleDateFormat) {
+        return simpleDateFormat.format(date);
     }
 
     public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern) {
-        return formatLocalDateTime(localDateTime, pattern, TimeFormatterUtils.getDefaultLocale());
+        return formatLocalDateTime(localDateTime, TimeFormatterUtils.getDateTimeFormatter(pattern));
     }
 
     public static String formatLocalDateTime(LocalDateTime localDateTime, String pattern, Locale locale) {
-        return localDateTime.format(TimeFormatterUtils.getDateTimeFormatter(pattern, locale));
+        return formatLocalDateTime(localDateTime, TimeFormatterUtils.getDateTimeFormatter(pattern, locale));
+    }
+
+    public static String formatLocalDateTime(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
+        return localDateTime.format(dateTimeFormatter);
     }
 
     public static String formatInstant(Instant instant, String pattern) {
