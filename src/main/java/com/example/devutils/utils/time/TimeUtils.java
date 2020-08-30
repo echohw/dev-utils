@@ -10,12 +10,14 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -28,66 +30,73 @@ public class TimeUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TimeUtils.class);
 
-    public static Date getNowDate() {
-        return new Date();
-    }
-
-    public static long getNowTimestamp() {
+    /* ====================当前==================== */
+    public static long nowTimestamp() {
         return System.currentTimeMillis();
     }
 
-    public static LocalDateTime getNowLocalDateTime() {
+    public static Date nowDate() {
+        return new Date();
+    }
+
+    public static LocalDateTime nowLocalDateTime() {
         return LocalDateTime.now();
     }
 
-    public static LocalDate getNowLocalDate() {
+    public static LocalDate nowLocalDate() {
         return LocalDate.now();
     }
 
-    public static LocalTime getNowLocalTime() {
+    public static LocalTime nowLocalTime() {
         return LocalTime.now();
     }
 
-    public static YearMonth getNowYearMonth() {
+    public static YearMonth nowYearMonth() {
         return YearMonth.now();
     }
 
-    public static Instant getNowInstant() {
+    public static Instant nowInstant() {
         return Instant.now();
     }
 
-    public static Date getDate(long timestamp) {
+    public static ZonedDateTime nowZonedDateTime() {
+        return ZonedDateTime.now();
+    }
+
+    /* ====================构造==================== */
+    public static Date ofDate(long timestamp) {
         return new Date(timestamp);
     }
 
-    public static LocalDateTime getLocalDateTime(int year, int month, int dayOfMonth, int hour, int minute, int second) {
+    public static LocalDateTime ofLocalDateTime(long timestamp) {
+        return toLocalDateTime(ofInstant(timestamp));
+    }
+
+    public static LocalDateTime ofLocalDateTime(int year, int month, int dayOfMonth, int hour, int minute, int second) {
         return LocalDateTime.of(year, month, dayOfMonth, hour, minute, second);
     }
 
-    public static LocalDate getLocalDate(int year, int month, int dayOfMonth) {
+    public static LocalDate ofLocalDate(int year, int month, int dayOfMonth) {
         return LocalDate.of(year, month, dayOfMonth);
     }
 
-    public static LocalTime getLocalTime(int hour, int minute, int second) {
+    public static LocalTime ofLocalTime(int hour, int minute, int second) {
         return LocalTime.of(hour, minute, second);
     }
 
-    public static YearMonth getYearMonth(int year, int month) {
+    public static YearMonth ofYearMonth(int year, int month) {
         return YearMonth.of(year, month);
     }
 
-    public static Instant getInstant(long epochMilli) {
+    public static Instant ofInstant(long epochMilli) {
         return Instant.ofEpochMilli(epochMilli);
     }
 
-    public static Date toDate(LocalDateTime localDateTime) {
-        return toDate(toInstant(localDateTime, ZoneIds.SYSTEM_ZONE));
+    public static ZonedDateTime ofZonedDateTime(LocalDateTime localDateTime, ZoneId zoneId) {
+        return ZonedDateTime.of(localDateTime, zoneId);
     }
 
-    public static Date toDate(Instant instant) {
-        return Date.from(instant);
-    }
-
+    /* ====================转换==================== */
     public static long toTimestamp(Date date) {
         return date.getTime();
     }
@@ -98,6 +107,14 @@ public class TimeUtils {
 
     public static long toTimestamp(Instant instant) {
         return instant.toEpochMilli();
+    }
+
+    public static Date toDate(LocalDateTime localDateTime) {
+        return toDate(toInstant(localDateTime, ZoneIds.SYSTEM_ZONE));
+    }
+
+    public static Date toDate(Instant instant) {
+        return Date.from(instant);
     }
 
     public static LocalDateTime toLocalDateTime(Date date) {
@@ -124,17 +141,18 @@ public class TimeUtils {
         return localDateTime.atZone(zoneId).toInstant();
     }
 
+    /* ====================调整==================== */
+    public static Date plus(Date date, int amountToAdd, TemporalUnit unit) {
+        Instant instant = plus(date.toInstant(), amountToAdd, unit);
+        return toDate(instant);
+    }
+
     public static LocalDateTime plus(LocalDateTime localDateTime, int amountToAdd, TemporalUnit unit) {
         return localDateTime.plus(amountToAdd, unit);
     }
 
     public static Instant plus(Instant instant, int amountToAdd, TemporalUnit unit) {
         return instant.plus(amountToAdd, unit);
-    }
-
-    public static Date plus(Date date, int amountToAdd, TemporalUnit unit) {
-        Instant instant = plus(date.toInstant(), amountToAdd, unit);
-        return toDate(instant);
     }
 
     public static LocalDateTime adjustToYear(LocalDateTime localDateTime, int year) {
@@ -149,14 +167,35 @@ public class TimeUtils {
         return localDateTime.withDayOfMonth(dayOfMonth);
     }
 
+    public static LocalDateTime adjustToFirstDayOfMonth(LocalDateTime localDateTime) {
+        return localDateTime.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
     public static LocalDateTime adjustToLastDayOfMonth(LocalDateTime localDateTime) {
         return localDateTime.with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    public static Date adjustToStartOfDay(Date date) {
+        return toDate(adjustToStartOfDay(toLocalDateTime(date)));
+    }
+
+    public static LocalDateTime adjustToStartOfDay(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MIN);
+    }
+
+    public static Date adjustToEndOfDay(Date date) {
+        return toDate(adjustToEndOfDay(toLocalDateTime(date)));
+    }
+
+    public static LocalDateTime adjustToEndOfDay(LocalDateTime localDateTime) {
+        return LocalDateTime.of(localDateTime.toLocalDate(), LocalTime.MAX);
     }
 
     public static LocalDateTime adjustTimeZone(LocalDateTime srcDateTime, ZoneId srcZoneId, ZoneId targetZoneId) {
         return toLocalDateTime(toInstant(srcDateTime, srcZoneId), targetZoneId);
     }
 
+    /* ====================解析==================== */
     public static Date parseToDate(String dateStr, String pattern) throws ParseException {
         return TimeFormatterUtils.getSimpleDateFormat(pattern).parse(dateStr);
     }
@@ -176,10 +215,12 @@ public class TimeUtils {
         ParseException exception = null;
         for (Tuple2<String, Locale> tuple2 : patternLocales) {
             try {
-                return parseToDate(dateStr, tuple2.v1, tuple2.v2);
+                Date date = parseToDate(dateStr, tuple2.v1, tuple2.v2);
+                logger.info("解析成功, date:{}, pattern:{}", dateStr, tuple2.v1);
+                return date;
             } catch (ParseException ex) {
                 exception = ex;
-                logger.error("Parsing failed, date:{}, pattern:{}", dateStr, tuple2.v1);
+                logger.error("解析失败, date:{}, pattern:{}", dateStr, tuple2.v1);
             }
         }
         throw exception;
@@ -189,10 +230,15 @@ public class TimeUtils {
         return LocalDateTime.parse(dateTimeStr, TimeFormatterUtils.getDateTimeFormatter(pattern));
     }
 
-    public static Instant parseToInstant(String instantStr, String pattern) {
-        return ZonedDateTime.parse(instantStr, TimeFormatterUtils.getDateTimeFormatter(pattern)).toInstant();
+    public static Instant parseToInstant(String instantStr) {
+        return Instant.parse(instantStr);
     }
 
+    public static ZonedDateTime parseToZonedDateTime(String zonedDateTimeStr) {
+        return ZonedDateTime.parse(zonedDateTimeStr);
+    }
+
+    /* ====================格式化==================== */
     public static String formatDate(Date date, String pattern) {
         return formatDate(date, pattern, TimeFormatterUtils.getDefaultLocale());
     }
@@ -221,6 +267,7 @@ public class TimeUtils {
         return TimeFormatterUtils.getDateTimeFormatter(pattern, locale).withZone(zoneId).format(instant);
     }
 
+    /* ====================相差==================== */
     public static long betweenDays(LocalDateTime startInclusive, LocalDateTime endExclusive) {
         return Duration.between(startInclusive, endExclusive).toDays();
     }
@@ -233,4 +280,25 @@ public class TimeUtils {
         return Duration.between(startInclusive, endExclusive).toMinutes();
     }
 
+    public static long between(Temporal startInclusive, Temporal endExclusive, TimeUnit timeUnit) {
+        Duration duration = Duration.between(startInclusive, endExclusive);
+        switch (timeUnit) {
+            case NANOSECONDS:
+                return duration.toNanos();
+            case MICROSECONDS:
+                return TimeUnit.NANOSECONDS.toMicros(duration.toNanos());
+            case MILLISECONDS:
+                return duration.toMillis();
+            case SECONDS:
+                return TimeUnit.MILLISECONDS.toSeconds(duration.toMillis());
+            case MINUTES:
+                return duration.toMinutes();
+            case HOURS:
+                return duration.toHours();
+            case DAYS:
+                return duration.toDays();
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

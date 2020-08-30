@@ -28,19 +28,15 @@ public class ListUtils extends CollectionUtils {
      * 排序[自身排序]
      */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator) {
-        return sort(list, comparator, null);
+        list.sort(comparator);
+        return list;
     }
 
     /**
-     * 排序[自身排序 or 返回新的列表]
+     * 排序[返回新的列表]
      */
     public static <I, L extends List<I>> L sort(L list, Comparator<I> comparator, Supplier<L> listSupplier) {
-        if (listSupplier == null) {
-            list.sort(comparator);
-            return list;
-        } else {
-            return list.stream().sorted(comparator).collect(Collectors.toCollection(listSupplier));
-        }
+        return list.stream().sorted(comparator).collect(Collectors.toCollection(listSupplier));
     }
 
     /**

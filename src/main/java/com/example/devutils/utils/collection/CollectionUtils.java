@@ -59,6 +59,10 @@ public class CollectionUtils {
         }, M::putAll);
     }
 
+    public static <T, K> Map<K, List<T>> grouping(Collection<T> collection, Function<T, List<K>> keysFunc) {
+         return grouping(collection, HashMap::new, key -> new ArrayList<>(), keysFunc);
+    }
+
     /**
      * 集合元素分组(元素在顺序上应该存在一定的关联)
      * @param collection 元素集
@@ -143,7 +147,7 @@ public class CollectionUtils {
      */
     @SafeVarargs
     public static <I, C extends Collection<I>, R extends Collection<I>> R union(Supplier<R> collectionSupplier, C... collections) {
-        return Arrays.stream(collections).flatMap(Collection::stream).collect(Collectors.toCollection(collectionSupplier));
+        return Arrays.stream(collections).flatMap(Collection::stream).distinct().collect(Collectors.toCollection(collectionSupplier));
     }
 
     /**

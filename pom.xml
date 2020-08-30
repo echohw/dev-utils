@@ -11,7 +11,7 @@
   </parent>
   <groupId>com.example</groupId>
   <artifactId>dev-utils</artifactId>
-  <version>0.0.1.20082601-SNAPSHOT</version>
+  <version>0.0.1.20083001-SNAPSHOT</version>
 
   <properties>
     <java.version>1.8</java.version>
