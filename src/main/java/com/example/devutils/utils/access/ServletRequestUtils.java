@@ -1,23 +1,28 @@
 package com.example.devutils.utils.access;
 
-import com.example.devutils.dep.Charsets;
+import com.example.devutils.constant.CharsetConsts;
 import com.example.devutils.utils.codec.URLUtils;
+import com.example.devutils.utils.collection.MapUtils;
 import com.example.devutils.utils.io.StreamUtils;
 import com.example.devutils.utils.text.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.jooq.lambda.Unchecked;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.MultiValueMap;
+import org.jooq.lambda.tuple.Tuple2;
 
 /**
  * Created by AMe on 2020-06-21 14:52.
@@ -32,14 +37,51 @@ public class ServletRequestUtils {
         return request.getRequestURL().toString();
     }
 
-    public static String getQueryStr(HttpServletRequest request, boolean decode) {
-        String queryStr = Optional.ofNullable(request.getQueryString()).orElse("");
-        return decode ? Unchecked.supplier(() -> URLUtils.decode(queryStr, Charsets.UTF_8)).get() : queryStr;
+    public static String getQueryString(HttpServletRequest request, boolean decode) {
+        String queryStr = request.getQueryString();
+        return queryStr != null && decode ? Unchecked.supplier(() -> URLUtils.decode(queryStr, CharsetConsts.UTF_8)).get() : queryStr;
     }
 
-    public static MultiValueMap<String, String> getQueryParams(HttpServletRequest request) {
-        return CollectionUtils.toMultiValueMap(
-            request.getParameterMap().entrySet().stream().collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), Arrays.asList(entry.getValue())), LinkedHashMap::putAll)
+    public static Map<String, List<String>> parseQueryString(String queryStr) {
+        if (StringUtils.isBlank(queryStr)) {
+            return Collections.emptyMap();
+        } else {
+            Map<String, List<Tuple2<String, String>>> collect = Arrays.stream(queryStr.split("&"))
+                .filter(StringUtils::isNotBlank)
+                .map(nameValue -> {
+                    int position = nameValue.indexOf("=");
+                    if (position < 0) {
+                        return new Tuple2<>(nameValue, "");
+                    } else {
+                        return new Tuple2<>(nameValue.substring(0, position), nameValue.substring(position + 1));
+                    }
+                }).collect(Collectors.groupingBy(tuple -> tuple.v1));
+            return collect.keySet().stream()
+                .collect(LinkedHashMap::new, (map, name) -> {
+                    List<String> values = collect.get(name).stream().flatMap(tuple -> Arrays.stream(tuple.v2.split(","))).collect(Collectors.toList());
+                    map.put(name, values);
+                }, LinkedHashMap::putAll);
+        }
+    }
+
+    public static String toQueryString(Map<String, List<String>> paramMap, boolean separatedByComma) {
+        if (MapUtils.isEmpty(paramMap)) {
+            return "";
+        }
+        Stream<Entry<String, List<String>>> entryStream = paramMap.entrySet().stream();
+        if (separatedByComma) {
+            return entryStream.map(entry -> entry.getKey() + "=" + String.join(",", entry.getValue())).collect(Collectors.joining("&"));
+        } else {
+            return entryStream.flatMap(entry -> entry.getValue().stream().map(item -> entry.getKey() + "=" + item)).collect(Collectors.joining("&"));
+        }
+    }
+
+    public static Map<String, List<String>> getRequestParams(HttpServletRequest request) {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        return parameterMap.entrySet().stream().collect(
+            LinkedHashMap::new,
+            (map, entry) -> map.put(entry.getKey(), Arrays.asList(entry.getValue())),
+            LinkedHashMap::putAll
         );
     }
 
@@ -51,17 +93,8 @@ public class ServletRequestUtils {
         }
     }
 
-    public static String getBodyAsStr(HttpServletRequest request) throws IOException {
-        return new String(getBodyAsBytes(request), Charsets.UTF_8);
-    }
-
-    public static String getReqParams(HttpServletRequest request, String httpMethod) throws IOException {
-        if ("GET".equalsIgnoreCase(httpMethod)) {
-            return getQueryStr(request, true);
-        } else if ("POST".equalsIgnoreCase(httpMethod)) {
-            return getBodyAsStr(request);
-        }
-        return "";
+    public static String getBodyAsString(HttpServletRequest request) throws IOException {
+        return new String(getBodyAsBytes(request), CharsetConsts.UTF_8);
     }
 
     public static String getIp(HttpServletRequest request) {
@@ -120,8 +153,9 @@ public class ServletRequestUtils {
         return Optional.ofNullable(getSession(request, false)).map(HttpSession::getId).orElse(null);
     }
 
-    public static Object getSessionAttrValue(HttpServletRequest request, String attrName) {
-        return Optional.ofNullable(getSession(request, false)).map(session -> session.getAttribute(attrName)).orElse(null);
+    @SuppressWarnings("unchecked")
+    public static <T> T getSessionAttributeValue(HttpServletRequest request, String attrName) {
+        return (T) Optional.ofNullable(getSession(request, false)).map(session -> session.getAttribute(attrName)).orElse(null);
     }
 
 }

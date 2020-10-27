@@ -1,11 +1,11 @@
-package com.example.devutils.dep;
+package com.example.devutils.constant;
 
 import java.nio.charset.Charset;
 
 /**
  * Created by AMe on 2020-06-15 03:17.
  */
-public class Charsets {
+public class CharsetConsts {
 
     public static final Charset SYSTEM = Charset.forName(System.getProperty("file.encoding"));
 
@@ -14,5 +14,4 @@ public class Charsets {
     public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
 
     public static final Charset DEFAULT = Charset.defaultCharset();
-
 }

@@ -17,4 +17,23 @@ public class BooleanUtils {
         return !isTrue(value);
     }
 
+    public static boolean isTrue(Object value) {
+        if (value == null) {
+            return false;
+        } else {
+            if (value instanceof Number) {
+                return ((Number) value).longValue() != 0;
+            } else if (value instanceof String) {
+                String trim = ((String) value).trim();
+                return trim.length() > 0 && !"0".equals(trim) && !"false".equalsIgnoreCase(trim);
+            } else if (value instanceof Boolean) {
+                return (Boolean) value;
+            }
+            return true;
+        }
+    }
+
+    public static boolean isFalse(Object value) {
+        return !isTrue(value);
+    }
 }

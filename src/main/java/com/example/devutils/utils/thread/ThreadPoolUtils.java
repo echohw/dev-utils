@@ -1,13 +1,15 @@
-package com.example.devutils.utils;
+package com.example.devutils.utils.thread;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor.AbortPolicy;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -15,7 +17,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class ThreadPoolUtils {
 
-    private static final ExecutorService singleThreadExecutor = newSingleThreadExecutor();
+    private static final ExecutorService singleThreadExecutor = newThreadPoolExecutor(1, 1, 0L,
+        TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(10000));
 
     public static ExecutorService newSingleThreadExecutor() {
         return Executors.newSingleThreadExecutor();
@@ -65,6 +68,12 @@ public class ThreadPoolUtils {
         return Executors.newWorkStealingPool(parallelism);
     }
 
+    public static ExecutorService newThreadPoolExecutor(int corePoolSize, int maximumPoolSize,
+        long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue
+    ) {
+        return newThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, Executors.defaultThreadFactory(), new AbortPolicy());
+    }
+
     public static ExecutorService newThreadPoolExecutor(
         int corePoolSize, int maximumPoolSize,
         long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue,
@@ -88,5 +97,4 @@ public class ThreadPoolUtils {
     public static void execute(Runnable runnable) {
         singleThreadExecutor.execute(runnable);
     }
-
 }

@@ -1,6 +1,7 @@
 package com.example.devutils.utils.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,7 +42,7 @@ public class PathUtils {
     }
 
     public static boolean isFile(Path path) {
-        return !isDirectory(path);
+        return Files.isRegularFile(path);
     }
 
     public static boolean isDirectory(Path path) {
@@ -61,4 +62,11 @@ public class PathUtils {
         return targetPath.resolve(relaPath);
     }
 
+    public static void delete(Path path) throws IOException {
+        if (isFile(path)) {
+            NioFileUtils.delete(path);
+        } else if (isDirectory(path)){
+            DirectoryUtils.delete(path);
+        }
+    }
 }

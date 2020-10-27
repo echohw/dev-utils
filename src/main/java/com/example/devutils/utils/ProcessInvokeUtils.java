@@ -1,12 +1,14 @@
 package com.example.devutils.utils;
 
-import com.example.devutils.dep.Charsets;
+import com.example.devutils.constant.CharsetConsts;
 import com.example.devutils.utils.io.StreamUtils;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,27 +30,29 @@ public class ProcessInvokeUtils {
     }
 
     public static void invoke(String cmd) throws IOException, InterruptedException {
-        invoke(cmd, process -> {
-            try (
-                InputStream inputStream = process.getInputStream();
-                InputStream errorStream = process.getErrorStream();
-            ) {
-                String out = StreamUtils.readAsString(inputStream, Charsets.UTF_8);
-                String err = StreamUtils.readAsString(errorStream, Charsets.UTF_8);
-                logger.info("OutputStream: {}", out);
-                logger.info("ErrorStream: {}", err);
-            } catch (IOException ex) {
-                logger.error(ex.getMessage());
-            }
-        });
+        invoke(cmd, getDefaultProcessConsumer(CharsetConsts.UTF_8));
     }
 
     public static void invoke(String cmd, Consumer<Process> resConsumer) throws IOException, InterruptedException {
-        invoke(getRuntime(), cmd, resConsumer);
+        invoke(cmd, null, null, resConsumer);
     }
 
-    public static void invoke(Runtime runtime, String cmd, Consumer<Process> resConsumer) throws IOException, InterruptedException {
-        Process process = runtime.exec(cmd);
+    public static void invoke(String cmd, String[] envp, File dir, Consumer<Process> resConsumer) throws IOException, InterruptedException {
+        invoke(getRuntime(), cmd, envp, dir, resConsumer);
+    }
+
+    public static void invoke(Runtime runtime, String cmd, String[] envp, File dir, Consumer<Process> resConsumer) throws IOException, InterruptedException {
+        if (cmd.length() == 0) throw new IllegalArgumentException("Empty command");
+        StringTokenizer st = new StringTokenizer(cmd);
+        String[] cmds = new String[st.countTokens()];
+        for (int i = 0; st.hasMoreTokens(); i++) {
+            cmds[i] = st.nextToken();
+        }
+        invoke(runtime, cmds, envp, dir, resConsumer);
+    }
+
+    public static void invoke(Runtime runtime, String[] cmds, String[] envp, File dir, Consumer<Process> resConsumer) throws IOException, InterruptedException {
+        Process process = runtime.exec(cmds, envp, dir);
         if (resConsumer != null) resConsumer.accept(process);
         process.waitFor();
         process.destroy();
@@ -66,4 +70,19 @@ public class ProcessInvokeUtils {
         invoke(CMD_SELECT_WINDOWS + path, null);
     }
 
+    public static Consumer<Process> getDefaultProcessConsumer(Charset charset) {
+        return process -> {
+            try (
+                InputStream inputStream = process.getInputStream();
+                InputStream errorStream = process.getErrorStream();
+            ) {
+                String out = StreamUtils.readAsString(inputStream, charset);
+                String err = StreamUtils.readAsString(errorStream, charset);
+                logger.info("OutputStream: {}", out);
+                logger.info("ErrorStream: {}", err);
+            } catch (Exception ex) {
+                logger.error("", ex);
+            }
+        };
+    }
 }

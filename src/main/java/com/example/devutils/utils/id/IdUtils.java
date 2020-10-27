@@ -1,6 +1,5 @@
 package com.example.devutils.utils.id;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -8,23 +7,19 @@ import java.util.UUID;
  */
 public class IdUtils {
 
-    private SnowFlake snowFlake;
-
-    public IdUtils(SnowFlake snowFlake) {
-        this.snowFlake = Objects.requireNonNull(snowFlake);
-    }
+    private static final IdGeneratorHolder<UUID, String> UUID_GENERATOR = new IdGeneratorHolder<>((UUID) null, uuid -> UUID.randomUUID().toString());
+    private static final IdGeneratorHolder<SnowFlake, Long> SNOWID_GENERATOR = new IdGeneratorHolder<>(new SnowFlake(), SnowFlake::nextId);
 
     public static String nextUuid() {
         return nextUuid(false);
     }
 
     public static String nextUuid(boolean withSeparator) {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = UUID_GENERATOR.next();
         return withSeparator ? uuid : uuid.replace("-", "");
     }
 
-    public long nextSnowId() {
-        return this.snowFlake.nextId();
+    public static Long nextSnowId() {
+        return SNOWID_GENERATOR.next();
     }
-
 }

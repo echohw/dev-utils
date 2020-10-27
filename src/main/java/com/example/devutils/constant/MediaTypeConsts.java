@@ -1,12 +1,13 @@
-package com.example.devutils.dep;
+package com.example.devutils.constant;
 
 /**
  * Created by AMe on 2020-06-24 00:27.
  */
-public class MediaTypes {
+public class MediaTypeConsts {
 
     public static final String ALL = "*/*";
     public static final String APPLICATION_ATOM_XML = "application/atom+xml";
+    public static final String APPLICATION_CBOR = "application/cbor";
     public static final String APPLICATION_FORM_URLENCODED = "application/x-www-form-urlencoded";
     public static final String APPLICATION_JSON = "application/json";
     public static final String APPLICATION_JSON_UTF8 = "application/json;charset=UTF-8";
@@ -31,6 +32,7 @@ public class MediaTypes {
     public static final String IMAGE_SVG = "image/svg+xml";
     public static final String IMAGE_SVG_UTF8 = "image/svg+xml;charset=UTF-8";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+    public static final String MULTIPART_MIXED = "multipart/mixed";
     public static final String TEXT_EVENT_STREAM = "text/event-stream";
     public static final String TEXT_HTML = "text/html";
     public static final String TEXT_MARKDOWN = "text/markdown";

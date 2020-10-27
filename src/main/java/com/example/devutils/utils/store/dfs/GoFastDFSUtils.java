@@ -1,6 +1,6 @@
 package com.example.devutils.utils.store.dfs;
 
-import com.example.devutils.dep.MediaTypes;
+import com.example.devutils.constant.MediaTypeConsts;
 import com.example.devutils.utils.http.OkHttpUtils;
 import com.example.devutils.utils.io.PathUtils;
 import java.io.File;
@@ -28,7 +28,7 @@ public class GoFastDFSUtils {
     public static String uploadFile(String filePath) throws IOException {
         String fileName = Optional.ofNullable(Paths.get(filePath)).filter(PathUtils::isFile).map(Path::getFileName).map(Path::toString).orElseThrow(() -> new IllegalArgumentException("错误的文件路径"));
         List<Part> parts = Arrays.asList(
-            Part.createFormData("file", fileName, RequestBody.create(MediaType.parse(MediaTypes.MULTIPART_FORM_DATA), new File(filePath))),
+            Part.createFormData("file", fileName, RequestBody.create(MediaType.parse(MediaTypeConsts.MULTIPART_FORM_DATA), new File(filePath))),
             Part.createFormData("output", "json")
         );
         RequestBody requestBody = okHttpUtils.buildMultipartBody(MultipartBody.FORM, parts);

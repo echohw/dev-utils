@@ -1,7 +1,6 @@
 package com.example.devutils.dep;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
 
@@ -10,32 +9,43 @@ import java.util.function.ToIntFunction;
  */
 public class ObjectWrapper<T> {
 
-    private T object;
-    private ToIntFunction<T> hashCodeFunc;
-    private BiPredicate<T, T> equalsPred;
-    private boolean force = false;
+    private final T object;
+    private final ToIntFunction<T> hashCodeFunc;
+    private final BiPredicate<T, Object> equalsPred;
+    private final boolean forceEquals;
 
-    public ObjectWrapper(T object, ToIntFunction<T> hashCodeFunc, BiPredicate<T, T> equalsPred) {
+    public ObjectWrapper(T object, ToIntFunction<T> hashCodeFunc, BiPredicate<T, Object> equalsPred) {
+        this(object, hashCodeFunc, equalsPred, false);
+    }
+
+    public ObjectWrapper(T object, ToIntFunction<T> hashCodeFunc, BiPredicate<T, Object> equalsPred, boolean forceEquals) {
         this.object = Objects.requireNonNull(object);
         this.hashCodeFunc = hashCodeFunc;
         this.equalsPred = equalsPred;
-    }
-
-    public ObjectWrapper force(boolean force) {
-        this.force = force;
-        return this;
+        this.forceEquals = forceEquals;
     }
 
     public T wrapped() {
         return object;
     }
 
-    @Override
-    public int hashCode() {
-        return Optional.ofNullable(hashCodeFunc).map(func -> func.applyAsInt(object)).orElseGet(() -> object.hashCode());
+    public ToIntFunction<T> hashCodeFunc() {
+        return hashCodeFunc;
     }
 
-    @SuppressWarnings(value = "unchecked")
+    public BiPredicate<T, Object> equalsPred() {
+        return equalsPred;
+    }
+
+    public boolean forceEquals() {
+        return forceEquals;
+    }
+
+    @Override
+    public int hashCode() {
+        return hashCodeFunc != null ? hashCodeFunc.applyAsInt(object) : object.hashCode();
+    }
+
     @Override
     public boolean equals(Object object2) {
         if (object2 instanceof ObjectWrapper) {
@@ -47,9 +57,8 @@ public class ObjectWrapper<T> {
         if (object == null || object2 == null) {
             return false;
         }
-        if (object2.getClass() == object.getClass() || force) {
-            Object o2 = object2;
-            return Optional.ofNullable(equalsPred).map(func -> func.test(object, (T) o2)).orElseGet(() -> object.equals(o2));
+        if (object2.getClass() == object.getClass() || forceEquals) {
+            return equalsPred != null ? equalsPred.test(object, object2) : object.equals(object2);
         } else {
             return false;
         }

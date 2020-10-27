@@ -4,16 +4,12 @@ import com.example.devutils.dep.WkhtmlOptions;
 import com.example.devutils.utils.ProcessInvokeUtils;
 import java.io.IOException;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * PDF转换工具类
  * Created by AMe on 2020-06-16 16:48.
  */
 public class WkhtmlUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(WkhtmlUtils.class);
 
     public static void renderToPdf(WkhtmlOptions options) throws IOException, InterruptedException {
         render(options.toPdfExecCmd());
@@ -38,5 +34,4 @@ public class WkhtmlUtils {
     public static void render(String cmd, Consumer<Process> consumer) throws IOException, InterruptedException {
         ProcessInvokeUtils.invoke(cmd, consumer);
     }
-
 }

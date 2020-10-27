@@ -1,6 +1,6 @@
 package com.example.devutils.utils.http;
 
-import com.example.devutils.dep.HttpMethods;
+import com.example.devutils.enums.HttpMethodEnum;
 import com.example.devutils.utils.collection.MapUtils;
 import java.io.IOException;
 import java.util.List;
@@ -97,11 +97,11 @@ public class OkHttpUtils {
     }
 
     public Response sendGetRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers) throws IOException {
-        return sendRequest(baseUrl, HttpMethods.GET, queryParams, headers, null);
+        return sendRequest(baseUrl, HttpMethodEnum.GET.name(), queryParams, headers, null);
     }
 
     public Response sendPostRequest(String baseUrl, Map<String, String> queryParams, Map<String, String> headers, RequestBody requestBody) throws IOException {
-        return sendRequest(baseUrl, HttpMethods.POST, queryParams, headers, requestBody);
+        return sendRequest(baseUrl, HttpMethodEnum.POST.name(), queryParams, headers, requestBody);
     }
 
     public static byte[] getRespBytes(Response response) throws IOException {

@@ -1,12 +1,11 @@
 package com.example.devutils.utils.office;
 
-import com.example.devutils.dep.MediaTypes;
+import com.example.devutils.constant.MediaTypeConsts;
 import com.example.devutils.utils.codec.Base64Utils;
 import com.example.devutils.utils.io.FileReader;
 import com.example.devutils.utils.text.StringUtils;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.commonmark.node.Image;
@@ -51,24 +50,28 @@ public class CommonMarkUtils {
 
     public static HtmlRenderer getHtmlRenderer(AttributeProviderFactory attributeProviderFactory, HtmlNodeRendererFactory htmlNodeRendererFactory) {
         Builder builder = HtmlRenderer.builder();
-        Optional.ofNullable(attributeProviderFactory).ifPresent(builder::attributeProviderFactory);
-        Optional.ofNullable(htmlNodeRendererFactory).ifPresent(builder::nodeRendererFactory);
+        if (attributeProviderFactory != null) builder.attributeProviderFactory(attributeProviderFactory);
+        if (htmlNodeRendererFactory != null) builder.nodeRendererFactory(htmlNodeRendererFactory);
         return builder.build();
     }
 
     public static AttributeProvider getAttributeProvider(Map<String, Map<String, String>> attrMaps) {
         return (node, tagName, attributes) -> {
-            attributes.putAll(Optional.ofNullable(attrMaps.get(tagName)).orElseGet(HashMap::new));
+            if (attrMaps.containsKey(tagName)) {
+                attributes.putAll(attrMaps.get(tagName));
+            }
         };
     }
 
     public static AttributeProvider getImageAttributeProvider(Map<String, String> attrs, boolean encodeImage) {
         return (node, tagName, attributes) -> {
             if (node instanceof Image) {
-                Optional.ofNullable(attrs).ifPresent(attributes::putAll);
+                if (attrs != null && !attrs.isEmpty()) {
+                    attributes.putAll(attrs);
+                }
                 if (encodeImage) {
                     Optional.ofNullable(attributes.get("src")).filter(StringUtils::isNotBlank)
-                        .ifPresent(Unchecked.consumer(path -> attributes.put("src", Base64Utils.encodeImageToString(FileReader.readFileAsBytes(path), MediaTypes.IMAGE_JPEG))));
+                        .ifPresent(Unchecked.consumer(path -> attributes.put("src", Base64Utils.encodeToString(FileReader.readFileAsBytes(path), MediaTypeConsts.IMAGE_JPEG))));
                 }
             }
         };
@@ -85,5 +88,4 @@ public class CommonMarkUtils {
     public static String renderToHtml(HtmlRenderer renderer, Node node) {
         return renderer.render(node);
     }
-
 }

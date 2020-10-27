@@ -1,7 +1,6 @@
 package com.example.devutils.utils.codec;
 
-import com.example.devutils.dep.Charsets;
-import com.example.devutils.dep.MediaTypes;
+import com.example.devutils.constant.CharsetConsts;
 import com.example.devutils.utils.text.StringUtils;
 import java.nio.charset.Charset;
 import java.util.Base64;
@@ -13,7 +12,7 @@ import java.util.Base64.Encoder;
  */
 public class Base64Utils {
 
-    private static final Charset DEFAULT_CHARSET = Charsets.UTF_8;
+    private static final Charset DEFAULT_CHARSET = CharsetConsts.UTF_8;
 
     public static Encoder getEncoder() {
         return Base64.getEncoder();
@@ -53,6 +52,9 @@ public class Base64Utils {
     }
 
     public static String encodeToUrlString(byte[] bytes) {
+        if (bytes.length == 0) {
+            return "";
+        }
         return new String(encodeUrl(bytes), DEFAULT_CHARSET);
     }
 
@@ -84,10 +86,11 @@ public class Base64Utils {
         return decodeUrl(base64Str.getBytes(DEFAULT_CHARSET));
     }
 
-    public static String encodeImageToString(byte[] bytes, String imageType) {
-        imageType = StringUtils.isBlank(imageType) ? MediaTypes.IMAGE_JPEG : imageType;
+    public static String encodeToString(byte[] bytes, String mediaType) {
         String base64Str = encodeToString(bytes);
-        return "data:" + imageType + ";base64," + base64Str;
+        if (StringUtils.isBlank(base64Str) || StringUtils.isBlank(mediaType)) {
+            return base64Str;
+        }
+        return "data:" + mediaType + ";base64," + base64Str;
     }
-
 }

@@ -3,7 +3,8 @@ package com.example.devutils.utils.collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Set集合操作工具类
@@ -11,11 +12,11 @@ import java.util.stream.Collectors;
  */
 public class SetUtils extends CollectionUtils {
 
-    /**
-     * HashSet排序
-     */
     public static <T> LinkedHashSet<T> sort(HashSet<T> hashSet, Comparator<T> comparator) {
-        return hashSet.stream().sorted(comparator).collect(Collectors.toCollection(LinkedHashSet::new));
+        return CollectionUtils.sort(hashSet, comparator, LinkedHashSet::new);
     }
 
+    public static <T, R extends List<T>> R sort(HashSet<T> hashSet, Comparator<T> comparator, Supplier<R> supplier) {
+        return CollectionUtils.sort(hashSet, comparator, supplier);
+    }
 }

@@ -1,6 +1,6 @@
 package com.example.devutils.utils.io;
 
-import com.example.devutils.dep.Charsets;
+import com.example.devutils.constant.CharsetConsts;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -16,7 +16,7 @@ public class NioBufferUtils {
     }
 
     public static ByteBuffer getByteBuffer(String content) {
-        return getByteBuffer(content, Charsets.UTF_8);
+        return getByteBuffer(content, CharsetConsts.UTF_8);
     }
 
     public static ByteBuffer getByteBuffer(String content, Charset charset) {

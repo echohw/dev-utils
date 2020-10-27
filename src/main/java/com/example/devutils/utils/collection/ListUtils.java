@@ -15,7 +15,7 @@ import java.util.stream.IntStream;
  */
 public class ListUtils extends CollectionUtils {
 
-    public static <I> ArrayList<I> of(int size, I filler) {
+    public static <I> List<I> of(int size, I filler) {
         return IntStream.range(0, size).boxed().map(t_ -> filler).collect(Collectors.toCollection(ArrayList::new));
     }
 

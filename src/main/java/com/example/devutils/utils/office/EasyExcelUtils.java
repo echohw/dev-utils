@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -49,10 +48,10 @@ public class EasyExcelUtils {
         Consumer<ExcelReaderSheetBuilder> excelReaderSheetBuilderConsumer
     ) {
         ExcelReaderBuilder excelReaderBuilder = EasyExcel.read(inputFile, head, readListener);
-        Optional.ofNullable(excelReaderBuilderConsumer).ifPresent(consumer -> consumer.accept(excelReaderBuilder));
+        if (excelReaderBuilderConsumer != null) excelReaderBuilderConsumer.accept(excelReaderBuilder);
         ExcelReader excelReader = excelReaderBuilder.build();
         ExcelReaderSheetBuilder excelReaderSheetBuilder = EasyExcel.readSheet(sheetNo);
-        Optional.ofNullable(excelReaderSheetBuilderConsumer).ifPresent(consumer -> consumer.accept(excelReaderSheetBuilder));
+        if (excelReaderSheetBuilderConsumer != null) excelReaderSheetBuilderConsumer.accept(excelReaderSheetBuilder);
         ReadSheet readSheet = excelReaderSheetBuilder.build();
         excelReader.read(readSheet);
         excelReader.finish();
@@ -92,10 +91,10 @@ public class EasyExcelUtils {
         BiConsumer<ExcelWriter, WriteSheet> writeOptConsumer
     ) {
         ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(outputStream, head);
-        Optional.ofNullable(excelWriterBuilderConsumer).ifPresent(consumer -> consumer.accept(excelWriterBuilder));
+        if (excelWriterBuilderConsumer != null) excelWriterBuilderConsumer.accept(excelWriterBuilder);
         ExcelWriter excelWriter = excelWriterBuilder.build();
         ExcelWriterSheetBuilder excelWriterSheetBuilder = EasyExcel.writerSheet(sheetName);
-        Optional.ofNullable(excelWriterSheetBuilderConsumer).ifPresent(consumer -> consumer.accept(excelWriterSheetBuilder));
+        if (excelWriterSheetBuilderConsumer != null) excelWriterSheetBuilderConsumer.accept(excelWriterSheetBuilder);
         WriteSheet writeSheet = excelWriterSheetBuilder.build();
         writeOptConsumer.accept(excelWriter, writeSheet);
         excelWriter.finish();

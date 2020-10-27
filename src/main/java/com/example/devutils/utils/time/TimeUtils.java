@@ -1,6 +1,6 @@
 package com.example.devutils.utils.time;
 
-import com.example.devutils.dep.ZoneIds;
+import com.example.devutils.constant.ZoneIdConsts;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -112,7 +112,7 @@ public class TimeUtils {
     }
 
     public static Date toDate(LocalDateTime localDateTime) {
-        return toDate(toInstant(localDateTime, ZoneIds.SYSTEM_ZONE));
+        return toDate(toInstant(localDateTime, ZoneIdConsts.SYSTEM_ZONE));
     }
 
     public static Date toDate(Instant instant) {
@@ -120,11 +120,11 @@ public class TimeUtils {
     }
 
     public static LocalDateTime toLocalDateTime(Date date) {
-        return toLocalDateTime(toInstant(date), ZoneIds.SYSTEM_ZONE);
+        return toLocalDateTime(toInstant(date), ZoneIdConsts.SYSTEM_ZONE);
     }
 
     public static LocalDateTime toLocalDateTime(Instant instant) {
-        return toLocalDateTime(instant, ZoneIds.DEFAULT_ZONE);
+        return toLocalDateTime(instant, ZoneIdConsts.DEFAULT_ZONE);
     }
 
     public static LocalDateTime toLocalDateTime(Instant instant, ZoneId zoneId) {
@@ -136,7 +136,7 @@ public class TimeUtils {
     }
 
     public static Instant toInstant(LocalDateTime localDateTime) {
-        return toInstant(localDateTime, ZoneIds.DEFAULT_ZONE);
+        return toInstant(localDateTime, ZoneIdConsts.DEFAULT_ZONE);
     }
 
     public static Instant toInstant(LocalDateTime localDateTime, ZoneId zoneId) {
@@ -278,7 +278,7 @@ public class TimeUtils {
     }
 
     public static String formatInstant(Instant instant, String pattern) {
-        return formatInstant(instant, pattern, ZoneIds.DEFAULT_ZONE);
+        return formatInstant(instant, pattern, ZoneIdConsts.DEFAULT_ZONE);
     }
 
     public static String formatInstant(Instant instant, String pattern, ZoneId zoneId) {

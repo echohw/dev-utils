@@ -1,7 +1,7 @@
 package com.example.devutils.utils.access;
 
-import com.example.devutils.dep.Charsets;
-import com.example.devutils.dep.MediaTypes;
+import com.example.devutils.constant.CharsetConsts;
+import com.example.devutils.constant.MediaTypeConsts;
 import com.example.devutils.utils.collection.MapUtils;
 import com.example.devutils.utils.io.StreamUtils;
 import java.io.BufferedInputStream;
@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -45,33 +46,37 @@ public class ServletResponseUtils {
     }
 
     public static void writeText(HttpServletResponse response, String content) throws IOException {
-        writeText(response, content, MediaTypes.TEXT_PLAIN);
+        writeText(response, content, MediaTypeConsts.TEXT_PLAIN);
     }
 
     public static void writeHtml(HttpServletResponse response, String content) throws IOException {
-        writeText(response, content, MediaTypes.TEXT_HTML);
+        writeText(response, content, MediaTypeConsts.TEXT_HTML);
     }
 
     public static void writeJson(HttpServletResponse response, String content) throws IOException {
-        writeText(response, content, MediaTypes.APPLICATION_JSON_UTF8);
+        writeText(response, content, MediaTypeConsts.APPLICATION_JSON);
     }
 
     public static void writeText(HttpServletResponse response, String content, String contentType) throws IOException {
         response.setContentType(contentType);
-        response.setCharacterEncoding(Charsets.UTF_8.name());
-        response.getWriter().write(content);
+        response.setCharacterEncoding(CharsetConsts.UTF_8.name());
+        try (
+            PrintWriter writer = response.getWriter();
+        ) {
+            writer.write(content);
+        }
     }
 
     public static void writeWord(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_WORD_DOCX);
+        writeFile(response, file, true, fileName, MediaTypeConsts.APPLICATION_WORD_DOCX);
     }
 
     public static void writeExcel(HttpServletResponse response, File file, String fileName) throws IOException {
-        writeFile(response, file, true, fileName, MediaTypes.APPLICATION_EXCEL_XLSX);
+        writeFile(response, file, true, fileName, MediaTypeConsts.APPLICATION_EXCEL_XLSX);
     }
 
     public static void writePdf(HttpServletResponse response, File file, boolean asAttachment, String fileName) throws IOException {
-        writeFile(response, file, asAttachment, fileName, MediaTypes.APPLICATION_PDF);
+        writeFile(response, file, asAttachment, fileName, MediaTypeConsts.APPLICATION_PDF);
     }
 
     public static void writeImg(HttpServletResponse response, File file, boolean asAttachment, String fileName, String contentType) throws IOException {
@@ -98,7 +103,7 @@ public class ServletResponseUtils {
     public static void write(HttpServletResponse response, Map<String, String> respHeaders, Consumer<OutputStream> consumer) throws IOException {
         response.reset();
         setHeaders(response, respHeaders);
-        response.setCharacterEncoding(Charsets.UTF_8.name());
+        response.setCharacterEncoding(CharsetConsts.UTF_8.name());
         try (
             ServletOutputStream outputStream = response.getOutputStream();
         ) {

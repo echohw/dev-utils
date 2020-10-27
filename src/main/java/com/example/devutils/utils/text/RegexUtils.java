@@ -1,6 +1,8 @@
 package com.example.devutils.utils.text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,7 +18,7 @@ public class RegexUtils {
     public static boolean match(String text, String regex, boolean ignoreCase) {
         Pattern pattern = getPattern(regex, ignoreCase);
         Matcher matcher = pattern.matcher(text);
-        return matcher.find();
+        return matcher.matches();
     }
 
     public static String[] findOne(String text, String regex, boolean ignoreCase) {
@@ -33,7 +35,7 @@ public class RegexUtils {
         return new String[0];
     }
 
-    public static ArrayList<String[]> findAll(String text, String regex, boolean ignoreCase) {
+    public static List<String[]> findAll(String text, String regex, boolean ignoreCase) {
         ArrayList<String[]> list = new ArrayList<>();
         Pattern pattern = getPattern(regex, ignoreCase);
         Matcher matcher = pattern.matcher(text);

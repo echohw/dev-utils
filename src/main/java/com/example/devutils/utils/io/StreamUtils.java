@@ -199,7 +199,11 @@ public class StreamUtils {
     }
 
     public static long copy(InputStream inputStream, OutputStream outputStream) throws IOException {
-        return copy(inputStream, outputStream, BUFFER_SIZE, null);
+        return copy(inputStream, outputStream, BUFFER_SIZE);
+    }
+
+    public static long copy(InputStream inputStream, OutputStream outputStream, int batchSize) throws IOException {
+        return copy(inputStream, outputStream, batchSize, null);
     }
 
     public static long copy(InputStream inputStream, OutputStream outputStream, int batchSize, Consumer<Range<Long>> noticeConsumer) throws IOException {

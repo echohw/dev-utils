@@ -1,4 +1,4 @@
-package com.example.devutils.utils;
+package com.example.devutils.utils.object;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,5 +35,4 @@ public class ObjectUtils {
     public static <T extends Serializable> T deepClone(T object) throws IOException, ClassNotFoundException {
         return readObject(writeObject(object));
     }
-
 }

@@ -35,18 +35,6 @@ public class WkhtmlOptions {
         return this;
     }
 
-    public WkhtmlOptions windows() {
-        this.pdfProgram = "wkhtmltopdf.exe";
-        this.imgProgram = "wkhtmltoimage.exe";
-        return this;
-    }
-
-    public WkhtmlOptions linux() {
-        this.pdfProgram = "wkhtmltopdf";
-        this.imgProgram = "wkhtmltoimage";
-        return this;
-    }
-
     public WkhtmlOptions htmlPath(String htmlPath) {
         this.htmlPath = htmlPath;
         return this;

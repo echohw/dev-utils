@@ -133,16 +133,19 @@ public class FileUtils {
             while ((nextEntry = zipInputStream.getNextEntry()) != null) {
                 String fileName = namingHandler.apply(nextEntry);
                 File destFile = new File(basePath, fileName);
-                try (
-                    BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destFile));
-                ) {
-                    StreamUtils.copy(zipInputStream, outputStream, BUFFER_SIZE, null);
+                if (nextEntry.isDirectory()) {
+                    DirectoryUtils.createDirs(destFile.toPath());
+                } else {
+                    try (
+                        BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(destFile));
+                    ) {
+                        StreamUtils.copy(zipInputStream, outputStream);
+                    }
+                    zipInputStream.closeEntry();
+                    destFileList.add(destFile);
                 }
-                zipInputStream.closeEntry();
-                destFileList.add(destFile);
             }
         }
         return destFileList;
     }
-
 }

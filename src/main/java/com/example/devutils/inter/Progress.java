@@ -3,11 +3,11 @@ package com.example.devutils.inter;
 /**
  * Created by AMe on 2020-06-11 15:42.
  */
-public interface Progress<T, R, P> {
+public interface Progress<T, P> {
 
-    R pre(T t);
+    void before(T t);
 
     void progress(P p);
 
-    void post(T t, R r);
+    void after(T t);
 }

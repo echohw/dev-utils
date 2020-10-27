@@ -1,11 +1,11 @@
-package com.example.devutils.dep;
+package com.example.devutils.constant;
 
 import java.time.ZoneId;
 
 /**
  * Created by AMe on 2020-06-18 21:41.
  */
-public class ZoneIds {
+public class ZoneIdConsts {
 
     public static final ZoneId SYSTEM_ZONE = ZoneId.systemDefault();
 
@@ -96,5 +96,4 @@ public class ZoneIds {
     public static final ZoneId ZONE_TONGATAPU = ZoneId.of("Pacific/Tongatapu"); // 东加塔布
 
     public static final ZoneId DEFAULT_ZONE = SYSTEM_ZONE;
-
 }
