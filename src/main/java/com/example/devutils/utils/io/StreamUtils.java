@@ -1,6 +1,6 @@
 package com.example.devutils.utils.io;
 
-import com.example.devutils.dep.Range;
+import com.example.devutils.deps.Range;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

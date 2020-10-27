@@ -1,4 +1,4 @@
-package com.example.devutils.dep;
+package com.example.devutils.deps;
 
 /**
  * Created by AMe on 2020-06-11 17:33.

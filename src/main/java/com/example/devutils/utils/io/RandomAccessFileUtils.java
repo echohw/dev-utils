@@ -1,6 +1,6 @@
 package com.example.devutils.utils.io;
 
-import com.example.devutils.inter.DataAgency;
+import com.example.devutils.deps.DataAgency;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
-package com.example.devutils.inter;
+package com.example.devutils.deps;
 
 /**
  * Created by AMe on 2020-06-08 23:40.

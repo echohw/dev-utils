@@ -1,4 +1,4 @@
-package com.example.devutils.dep;
+package com.example.devutils.utils.office;
 
 import com.example.devutils.utils.text.StringUtils;
 import java.util.LinkedHashMap;

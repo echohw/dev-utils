@@ -1,6 +1,6 @@
 package com.example.devutils.utils.number;
 
-import com.example.devutils.dep.CommonRange.LongRange;
+import com.example.devutils.deps.CommonRange.LongRange;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;

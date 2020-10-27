@@ -1,6 +1,6 @@
 package com.example.devutils.utils.collection;
 
-import com.example.devutils.dep.ObjectWrapper;
+import com.example.devutils.deps.ObjectWrapper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

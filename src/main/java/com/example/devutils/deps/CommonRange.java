@@ -1,4 +1,4 @@
-package com.example.devutils.dep;
+package com.example.devutils.deps;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

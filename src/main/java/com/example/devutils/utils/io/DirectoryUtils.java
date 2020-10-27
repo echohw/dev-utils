@@ -1,7 +1,7 @@
 package com.example.devutils.utils.io;
 
-import com.example.devutils.inter.Progress;
-import com.example.devutils.inter.ProgressAdapter;
+import com.example.devutils.deps.Progress;
+import com.example.devutils.deps.ProgressAdapter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileSystems;
