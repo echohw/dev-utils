@@ -13,7 +13,7 @@ import org.jooq.lambda.tuple.Tuple2;
  */
 public class TimeFormatterUtils {
 
-    private static final Map<Tuple2<String, Locale>, SimpleDateFormat> simpleDateFormatCache = new ConcurrentHashMap<>();
+    private static final ThreadLocal<Map<Tuple2<String, Locale>, SimpleDateFormat>> simpleDateFormatCacheThreadLocal = ThreadLocal.withInitial(ConcurrentHashMap::new);
     private static final Map<Tuple2<String, Locale>, DateTimeFormatter> dateTimeFormatterCache = new ConcurrentHashMap<>();
 
     public static SimpleDateFormat getSimpleDateFormat(String pattern) {
@@ -29,7 +29,7 @@ public class TimeFormatterUtils {
         if (tuple2.v2 == null) {
             tuple2 = new Tuple2<>(tuple2.v1, getDefaultLocale());
         }
-        return simpleDateFormatCache.computeIfAbsent(tuple2, tp2 -> new SimpleDateFormat(tp2.v1, tp2.v2));
+        return simpleDateFormatCacheThreadLocal.get().computeIfAbsent(tuple2, tp2 -> new SimpleDateFormat(tp2.v1, tp2.v2));
     }
 
     public static DateTimeFormatter getDateTimeFormatter(String pattern) {

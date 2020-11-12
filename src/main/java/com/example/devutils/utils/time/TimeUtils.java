@@ -197,6 +197,22 @@ public class TimeUtils {
         return toLocalDateTime(toInstant(srcDateTime, srcZoneId), targetZoneId);
     }
 
+    public static int getTotalDaysOfMonth(int year, int month) {
+        return LocalDate.of(year, month, 1).lengthOfMonth();
+    }
+
+    public static int getTotalDaysOfYear(int year) {
+        return LocalDate.of(year, 1, 1).lengthOfYear();
+    }
+
+    public static int getRemainingDaysOfMonth(LocalDate localDate) {
+        return localDate.lengthOfMonth() - localDate.getDayOfMonth();
+    }
+
+    public static int getRemainingDaysOfYear(LocalDate localDate) {
+        return localDate.lengthOfYear() - localDate.getDayOfYear();
+    }
+
     /* ====================解析==================== */
     public static Date parseToDate(String dateStr, String pattern) throws ParseException {
         return parseToDate(dateStr, TimeFormatterUtils.getSimpleDateFormat(pattern));
