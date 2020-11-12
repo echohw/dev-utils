@@ -97,7 +97,7 @@ public class RestTemplateUtils {
     }
 
     public ResponseExtractor<byte[]> getByteArrayResponseExtractor() {
-        return response -> StreamUtils.readAsBytes(response.getBody());
+        return response -> StreamUtils.readBytes(response.getBody());
     }
 
     private static <T> T nonNull(@Nullable T result) {

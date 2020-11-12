@@ -46,24 +46,24 @@ public class NioFileUtils {
         return Files.size(filePath);
     }
 
-    public static byte[] readAsBytes(Path filePath) throws IOException {
+    public static byte[] readBytes(Path filePath) throws IOException {
         return Files.readAllBytes(filePath);
     }
 
-    public static byte[] readAsBytes(Path filePath, long position, int size) throws IOException {
+    public static byte[] readBytes(Path filePath, long position, int size) throws IOException {
         try (
             FileChannel channel = NioChannelUtils.getFileChannel(filePath, StandardOpenOption.READ);
         ) {
             ByteBuffer byteBuffer = NioBufferUtils.getByteBuffer(BUFFER_SIZE, false);
-            return NioChannelUtils.readAsBytes(channel, byteBuffer, position, size);
+            return NioChannelUtils.readBytes(channel, byteBuffer, position, size);
         }
     }
 
-    public static String readAsString(Path filePath, Charset charset) throws IOException {
-        return new String(readAsBytes(filePath), charset);
+    public static String readString(Path filePath, Charset charset) throws IOException {
+        return new String(readBytes(filePath), charset);
     }
 
-    public static List<String> readAsLines(Path filePath, Charset charset) throws IOException {
+    public static List<String> readLines(Path filePath, Charset charset) throws IOException {
         return Files.readAllLines(filePath, charset);
     }
 

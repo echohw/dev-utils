@@ -76,8 +76,8 @@ public class ProcessInvokeUtils {
                 InputStream inputStream = process.getInputStream();
                 InputStream errorStream = process.getErrorStream();
             ) {
-                String out = StreamUtils.readAsString(inputStream, charset);
-                String err = StreamUtils.readAsString(errorStream, charset);
+                String out = StreamUtils.readString(inputStream, charset);
+                String err = StreamUtils.readString(errorStream, charset);
                 logger.info("OutputStream: {}", out);
                 logger.info("ErrorStream: {}", err);
             } catch (Exception ex) {

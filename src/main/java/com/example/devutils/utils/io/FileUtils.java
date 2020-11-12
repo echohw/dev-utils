@@ -48,27 +48,27 @@ public class FileUtils {
         return file.length();
     }
 
-    public static byte[] readAsBytes(File file) throws IOException {
+    public static byte[] readBytes(File file) throws IOException {
         try (
             BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
         ) {
-            return StreamUtils.readAsBytes(inputStream, BUFFER_SIZE);
+            return StreamUtils.readBytes(inputStream, BUFFER_SIZE);
         }
     }
 
-    public static String readAsString(File file, Charset charset) throws IOException {
+    public static String readString(File file, Charset charset) throws IOException {
         try (
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
         ) {
-            return StreamUtils.readAsString(bufferedReader, BUFFER_SIZE);
+            return StreamUtils.readString(bufferedReader, BUFFER_SIZE);
         }
     }
 
-    public static List<String> readAsLines(File file, Charset charset) throws IOException {
+    public static List<String> readLines(File file, Charset charset) throws IOException {
         try (
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), charset));
         ) {
-            return StreamUtils.readAsLines(bufferedReader);
+            return StreamUtils.readLines(bufferedReader);
         }
     }
 

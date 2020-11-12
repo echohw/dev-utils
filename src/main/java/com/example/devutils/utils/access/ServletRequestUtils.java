@@ -89,7 +89,7 @@ public class ServletRequestUtils {
         try (
             ServletInputStream inputStream = request.getInputStream();
         ) {
-            return StreamUtils.readAsBytes(inputStream);
+            return StreamUtils.readBytes(inputStream);
         }
     }
 

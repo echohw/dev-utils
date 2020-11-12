@@ -75,7 +75,7 @@ public class RandomAccessFileUtils {
         }
     }
 
-    public static byte[] readAsBytes(File file, long position, long size) throws IOException {
+    public static byte[] readBytes(File file, long position, long size) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (
             RandomAccessFile randomAccessFile = getRandomAccessFile(file, "r");
@@ -151,16 +151,16 @@ public class RandomAccessFileUtils {
         return copy(randomAccessFile, outputStream, position, size, BUFFER_SIZE);
     }
 
-    public static long copy(RandomAccessFile randomAccessFile, OutputStream outputStream, long position, long size, int batchSize) throws IOException {
+    public static long copy(RandomAccessFile randomAccessFile, OutputStream outputStream, long position, long size, int bufferSize) throws IOException {
         if (position + size > getSize(randomAccessFile)) {
             throw new IllegalArgumentException("The read position will exceed the file size");
         }
         long readCount = 0;
-        byte[] bytes = new byte[batchSize];
+        byte[] bytes = new byte[bufferSize];
         int len;
         randomAccessFile.seek(position);
         while (readCount < size) {
-            if (readCount + batchSize > size) {
+            if (readCount + bufferSize > size) {
                 len = randomAccessFile.read(bytes, 0, (int) (size - readCount));
             } else {
                 len = randomAccessFile.read(bytes);
@@ -179,9 +179,9 @@ public class RandomAccessFileUtils {
         return copy(inputStream, randomAccessFile, position, BUFFER_SIZE);
     }
 
-    public static long copy(InputStream inputStream, RandomAccessFile randomAccessFile, long position, int batchSize) throws IOException {
+    public static long copy(InputStream inputStream, RandomAccessFile randomAccessFile, long position, int bufferSize) throws IOException {
         long readCount = 0;
-        byte[] bytes = new byte[batchSize];
+        byte[] bytes = new byte[bufferSize];
         int len;
         randomAccessFile.seek(position);
         while ((len = inputStream.read(bytes)) > 0) {
@@ -195,17 +195,17 @@ public class RandomAccessFileUtils {
         return copy(readFile, readPosition, writeFile, writePosition, size, BUFFER_SIZE);
     }
 
-    public static long copy(RandomAccessFile readFile, long readPosition, RandomAccessFile writeFile, long writePosition, long size, int batchSize) throws IOException {
+    public static long copy(RandomAccessFile readFile, long readPosition, RandomAccessFile writeFile, long writePosition, long size, int bufferSize) throws IOException {
         if (readPosition + size > getSize(readFile)) {
             throw new IllegalArgumentException("The read position will exceed the file size");
         }
         long readCount = 0;
-        byte[] bytes = new byte[batchSize];
+        byte[] bytes = new byte[bufferSize];
         int len;
         readFile.seek(readPosition);
         writeFile.seek(writePosition);
         while (readCount < size) {
-            if (readCount + batchSize > size) {
+            if (readCount + bufferSize > size) {
                 len = readFile.read(bytes, 0, (int) (size - readCount));
             } else {
                 len = readFile.read(bytes);

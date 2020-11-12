@@ -135,35 +135,35 @@ public class StreamUtils {
         return new StringWriter();
     }
 
-    public static byte[] readAsBytes(InputStream inputStream) throws IOException {
-        return readAsBytes(inputStream, BUFFER_SIZE);
+    public static byte[] readBytes(InputStream inputStream) throws IOException {
+        return readBytes(inputStream, BUFFER_SIZE);
     }
 
-    public static byte[] readAsBytes(InputStream inputStream, int batchSize) throws IOException {
+    public static byte[] readBytes(InputStream inputStream, int bufferSize) throws IOException {
         ByteArrayOutputStream outputStream = getByteArrayOutputStream();
-        copy(inputStream, outputStream, batchSize, null);
+        copy(inputStream, outputStream, bufferSize, null);
         return outputStream.toByteArray();
     }
 
-    public static String readAsString(InputStream inputStream, Charset charset) throws IOException {
-        return readAsString(inputStream, BUFFER_SIZE, charset);
+    public static String readString(InputStream inputStream, Charset charset) throws IOException {
+        return readString(inputStream, BUFFER_SIZE, charset);
     }
 
-    public static String readAsString(InputStream inputStream, int batchSize, Charset charset) throws IOException {
-        return new String(readAsBytes(inputStream, batchSize), charset);
+    public static String readString(InputStream inputStream, int bufferSize, Charset charset) throws IOException {
+        return new String(readBytes(inputStream, bufferSize), charset);
     }
 
-    public static String readAsString(Reader reader) throws IOException {
-        return readAsString(reader, BUFFER_SIZE);
+    public static String readString(Reader reader) throws IOException {
+        return readString(reader, BUFFER_SIZE);
     }
 
-    public static String readAsString(Reader reader, int batchSize) throws IOException {
+    public static String readString(Reader reader, int bufferSize) throws IOException {
         StringWriter writer = getStringWriter();
-        copy(reader, writer, batchSize, null);
+        copy(reader, writer, bufferSize, null);
         return writer.toString();
     }
 
-    public static List<String> readAsLines(BufferedReader bufferedReader) throws IOException {
+    public static List<String> readLines(BufferedReader bufferedReader) throws IOException {
         ArrayList<String> lineList = new ArrayList<>();
         String line;
         while ((line = bufferedReader.readLine()) != null) {
@@ -202,13 +202,13 @@ public class StreamUtils {
         return copy(inputStream, outputStream, BUFFER_SIZE);
     }
 
-    public static long copy(InputStream inputStream, OutputStream outputStream, int batchSize) throws IOException {
-        return copy(inputStream, outputStream, batchSize, null);
+    public static long copy(InputStream inputStream, OutputStream outputStream, int bufferSize) throws IOException {
+        return copy(inputStream, outputStream, bufferSize, null);
     }
 
-    public static long copy(InputStream inputStream, OutputStream outputStream, int batchSize, Consumer<Range<Long>> noticeConsumer) throws IOException {
+    public static long copy(InputStream inputStream, OutputStream outputStream, int bufferSize, Consumer<Range<Long>> noticeConsumer) throws IOException {
         noticeConsumer = noticeConsumer == null ? obj -> {} : noticeConsumer;
-        byte[] bytes = new byte[batchSize];
+        byte[] bytes = new byte[bufferSize];
         long readCount = 0;
         int len;
         while ((len = inputStream.read(bytes)) > 0) {
@@ -224,9 +224,9 @@ public class StreamUtils {
         return copy(reader, writer, BUFFER_SIZE, null);
     }
 
-    public static long copy(Reader reader, Writer writer, int batchSize, Consumer<Range<Long>> noticeConsumer) throws IOException {
+    public static long copy(Reader reader, Writer writer, int bufferSize, Consumer<Range<Long>> noticeConsumer) throws IOException {
         noticeConsumer = noticeConsumer == null ? obj -> {} : noticeConsumer;
-        char[] chars = new char[batchSize];
+        char[] chars = new char[bufferSize];
         long readCount = 0;
         int len;
         while ((len = reader.read(chars)) > 0) {

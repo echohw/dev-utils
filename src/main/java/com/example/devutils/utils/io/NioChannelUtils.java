@@ -86,7 +86,7 @@ public class NioChannelUtils {
         return AsynchronousServerSocketChannel.open(channelGroup);
     }
 
-    public static byte[] readAsBytes(ReadableByteChannel channel, ByteBuffer byteBuffer) throws IOException {
+    public static byte[] readBytes(ReadableByteChannel channel, ByteBuffer byteBuffer) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byteBuffer.clear();
         while (channel.read(byteBuffer) > 0) {
@@ -97,7 +97,7 @@ public class NioChannelUtils {
         return outputStream.toByteArray();
     }
 
-    public static byte[] readAsBytes(FileChannel channel, ByteBuffer byteBuffer, long position, long size) throws IOException {
+    public static byte[] readBytes(FileChannel channel, ByteBuffer byteBuffer, long position, long size) throws IOException {
         if (position + size > channel.size()) {
             throw new IllegalArgumentException("The read position will exceed the file size");
         }
@@ -122,13 +122,13 @@ public class NioChannelUtils {
         return outputStream.toByteArray();
     }
 
-    public static byte[] readAsBytes(FileChannel channel, long position, int size) throws IOException {
+    public static byte[] readBytes(FileChannel channel, long position, int size) throws IOException {
         MappedByteBuffer mappedByteBuffer = channel.map(MapMode.READ_ONLY, position, size);
         return mappedByteBuffer.array();
     }
 
-    public static String readAsString(ReadableByteChannel channel, ByteBuffer byteBuffer, Charset charset) throws IOException {
-        byte[] bytes = readAsBytes(channel, byteBuffer);
+    public static String readString(ReadableByteChannel channel, ByteBuffer byteBuffer, Charset charset) throws IOException {
+        byte[] bytes = readBytes(channel, byteBuffer);
         return new String(bytes, charset);
     }
 
